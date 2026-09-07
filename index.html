@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Your Voice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F5F4EF;--surface:#FFFFFF;--surface-2:#FBFAF6;--border:#DEDBD1;--border-strong:#C7C3B6;--ink:#1E2420;--ink-soft:#5B655F;--ink-faint:#8B948C;--accent:#2F6B58;--accent-ink:#FFFFFF;--accent-soft:#E1EEE7;--danger:#A8402A;--danger-soft:#F6DFD8;--shadow:0 1px 2px rgba(30,36,32,.06),0 6px 18px rgba(30,36,32,.07);--font-display:'Archivo','Arial Narrow',sans-serif;--font-body:'IBM Plex Sans',system-ui,-apple-system,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101513;--surface:#171E1B;--surface-2:#1D2521;--border:#2B3531;--border-strong:#3A4642;--ink:#E7ECE8;--ink-soft:#A3ADA6;--ink-faint:#6E7873;--accent:#6FC8A8;--accent-ink:#0B1512;--accent-soft:#1D362E;--danger:#E38468;--danger-soft:#3A211A;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--bg:#101513;--surface:#171E1B;--surface-2:#1D2521;--border:#2B3531;--border-strong:#3A4642;--ink:#E7ECE8;--ink-soft:#A3ADA6;--ink-faint:#6E7873;--accent:#6FC8A8;--accent-ink:#0B1512;--accent-soft:#1D362E;--danger:#E38468;--danger-soft:#3A211A;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35)}
+*,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--font-body);-webkit-text-size-adjust:100%}
+h1,h2,strong{font-family:var(--font-display)}
+.btn-primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;min-height:44px}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:inherit;border-radius:8px;padding:9px 13px;font-size:13px;cursor:pointer;font-family:inherit;min-height:40px}
+.auth-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);padding:20px;overflow:auto}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:390px;box-shadow:var(--shadow)}
+.auth-card h2{margin:0 0 4px;font-size:19px}
+.auth-sub{margin:0 0 18px;font-size:13px;opacity:.72;line-height:1.45}
+.auth-card label{display:block;font-size:12px;opacity:.8;margin:12px 0 5px}
+.auth-card input{width:100%;box-sizing:border-box;padding:11px 12px;min-height:44px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:inherit;font-size:16px}
+.auth-card button[type=submit]{width:100%;margin-top:18px;padding:11px;font-size:14px}
+.auth-msg{margin:12px 0 0;font-size:12.5px;opacity:.85;line-height:1.4;min-height:18px}
+.auth-msg.bad{color:var(--danger);opacity:1}
+.hub{max-width:1000px;margin:0 auto;padding:26px 18px 70px}
+.hub-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+.hub-brand{display:flex;flex-direction:column;gap:3px}
+.hub-brand .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.5}
+.hub-brand h1{margin:0;font-size:22px;letter-spacing:-.01em}
+.hub-user{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hub-mail{font-size:12.5px;opacity:.65}
+.hub-lead{margin:0 0 22px;font-size:14px;opacity:.6;max-width:640px;line-height:1.6}
+.app-grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:760px){.app-grid{grid-template-columns:1fr 1fr}}
+.app-tile{display:flex;gap:14px;align-items:flex-start;padding:20px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);text-decoration:none;color:inherit;transition:border-color .15s,background .15s}
+.app-tile:hover{border-color:var(--accent)}
+.app-tile.disabled{opacity:.55;cursor:default}
+.app-icon{font-size:26px;line-height:1;flex:none}
+.app-body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.app-body strong{font-size:16px;display:flex;align-items:center;gap:8px}
+.app-desc{font-size:13px;line-height:1.55;opacity:.66}
+.app-go{font-size:12.5px;color:var(--accent);font-weight:600;margin-top:4px}
+.app-badge{font-family:var(--font-body);font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;background:var(--danger-soft);color:var(--danger);border-radius:5px;padding:2px 7px}
+.hub-foot{margin-top:34px;font-size:12px;opacity:.4;line-height:1.6}
+@media(max-width:720px){html{touch-action:manipulation}input,textarea,select{font-size:16px!important}.btn-ghost,.btn-primary{min-height:44px}}
+</style>
+</head>
+<body>
+<div id="hub" class="hub" hidden>
+  <div class="hub-top">
+    <div class="hub-brand"><span class="eyebrow">Your Voice</span><h1>Aplicații</h1></div>
+    <div class="hub-user"><span id="hub-mail" class="hub-mail"></span><button id="hub-logout" class="btn-ghost" type="button">Ieși</button></div>
+  </div>
+  <p class="hub-lead">Alege aplicația cu care vrei să lucrezi. Te autentifici o singură dată, pentru toate.</p>
+  <div class="app-grid">
+    <a class="app-tile" href="/tasks.html"><span class="app-icon">✅</span><span class="app-body"><strong>Task &amp; Projects</strong><span class="app-desc">Planul de 90 de zile plus proiectele tale, cu sarcini și bife care se salvează.</span><span class="app-go">Deschide →</span></span></a>
+    <span class="app-tile disabled"><span class="app-icon">🎙️</span><span class="app-body"><strong>QA Voice Board <span class="app-badge">În reconstrucție</span></strong><span class="app-desc">Testezi platforme și aplicații, dictezi ce observi, iar clientul primește un link cu ce merge, ce nu și ce ai rezolvat.</span></span></span>
+    <span class="app-tile disabled"><span class="app-icon">✉️</span><span class="app-body"><strong>Email <span class="app-badge">În reconstrucție</span></strong><span class="app-desc">Adresele tale, în platformă: citești, răspunzi și trimiți fără să mai deschizi altceva.</span></span></span>
+  </div>
+  <p class="hub-foot">Fiecare aplicație ține minte cine ești, cât timp cookie-ul de sesiune e valid pe domeniul ei. Aceleași date de logare ca înainte.</p>
+</div>
+<div id="auth-gate" class="auth-overlay">
+  <div class="auth-card">
+    <h2>Intră în Your Voice</h2>
+    <p class="auth-sub">Aceleași date ca înainte.</p>
+    <form id="auth-login-form">
+      <label for="auth-email">Adresă de e-mail</label>
+      <input id="auth-email" type="email" autocomplete="username" required>
+      <label for="auth-password">Parolă</label>
+      <input id="auth-password" type="password" autocomplete="current-password" required>
+      <button class="btn-primary" type="submit">Intră</button>
+      <p id="auth-login-msg" class="auth-msg"></p>
+    </form>
+  </div>
+</div>
+<script>
+!function(){"use strict";
+function el(id){return document.getElementById(id)}
+function msg(t,bad){var m=el("auth-login-msg");if(m){m.textContent=t||"";m.className="auth-msg"+(bad?" bad":"")}}
+function showGate(){el("auth-gate").hidden=!1;el("hub").hidden=!0}
+function showHub(){el("auth-gate").hidden=!0;el("hub").hidden=!1}
+function post(url,body){return fetch(url,{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify(body||{})}).then(function(r){return r.json().catch(function(){return{}}).then(function(d){return{status:r.status,data:d}})})}
+var f=el("auth-login-form");
+f.addEventListener("submit",function(ev){ev.preventDefault();msg("");
+var inputs=f.querySelectorAll("input,button");Array.prototype.forEach.call(inputs,function(x){x.disabled=!0});
+post("/api/auth?action=login",{email:(el("auth-email").value||"").trim(),password:el("auth-password").value||""}).then(function(r){
+if(200!==r.status){Array.prototype.forEach.call(inputs,function(x){x.disabled=!1});msg(r.data&&r.data.message||"Autentificare eșuată.",!0);return}
+location.reload()}).catch(function(){Array.prototype.forEach.call(inputs,function(x){x.disabled=!1});msg("Nu am putut contacta serverul.",!0)})});
+el("hub-logout").addEventListener("click",function(){post("/api/auth?action=logout").then(function(){location.reload()}).catch(function(){location.reload()})});
+fetch("/api/auth?action=me",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){
+if(!d||!d.authenticated)return void showGate();
+var m=el("hub-mail");m&&(m.textContent=d.email||"");
+showHub()}).catch(function(){showGate()})
+}();
+</script>
+</body>
+</html>

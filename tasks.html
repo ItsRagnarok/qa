@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Task &amp; Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#F5F4EF; --surface:#FFFFFF; --surface-2:#FBFAF6;
+  --border:#DEDBD1; --border-strong:#C7C3B6;
+  --ink:#1E2420; --ink-soft:#5B655F; --ink-faint:#8B948C;
+  --accent:#2F6B58; --accent-ink:#FFFFFF; --accent-soft:#E1EEE7;
+  --danger:#A8402A;
+  --blaze-rosu:#B23A32; --blaze-albastru:#2A5EA6; --blaze-galben:#B5820F; --blaze-punct:#9C3F6B;
+  --shadow:0 1px 2px rgba(30,36,32,.06),0 6px 18px rgba(30,36,32,.07);
+  --font-display:'Archivo','Arial Narrow',sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101513; --surface:#171E1B; --surface-2:#1D2521;
+  --border:#2B3531; --border-strong:#3A4642;
+  --ink:#E7ECE8; --ink-soft:#A3ADA6; --ink-faint:#6E7873;
+  --accent:#6FC8A8; --accent-ink:#0B1512; --accent-soft:#1D362E;
+  --danger:#E38468;
+  --blaze-rosu:#E1655F; --blaze-albastru:#6C9DE4; --blaze-galben:#E3AE3C; --blaze-punct:#DA76A6;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  --bg:#101513; --surface:#171E1B; --surface-2:#1D2521;
+  --border:#2B3531; --border-strong:#3A4642;
+  --ink:#E7ECE8; --ink-soft:#A3ADA6; --ink-faint:#6E7873;
+  --accent:#6FC8A8; --accent-ink:#0B1512; --accent-soft:#1D362E;
+  --danger:#E38468;
+  --blaze-rosu:#E1655F; --blaze-albastru:#6C9DE4; --blaze-galben:#E3AE3C; --blaze-punct:#DA76A6;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--font-display);margin:0}
+button,input,textarea,select{font:inherit;color:inherit}
+@media(max-width:720px){input,textarea,select{font-size:16px!important}}
+.wrap{max-width:800px;margin:0 auto;padding:0 16px calc(80px + env(safe-area-inset-bottom))}
+
+.gate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:22px;overflow:auto}
+.gate-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:392px;box-shadow:var(--shadow)}
+.gate-card h2{font-size:20px;margin-bottom:5px}
+.gate-sub{margin:0 0 18px;font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+.gate-card label{display:block;font-size:12.5px;color:var(--ink-soft);margin:13px 0 5px}
+.gate-card input{width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface-2);min-height:46px}
+.gate-msg{margin:13px 0 0;font-size:13px;color:var(--ink-soft);line-height:1.45;min-height:19px}
+.gate-msg.bad{color:var(--danger)}
+
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:9px;padding:0 18px;min-height:46px;font-weight:700;font-size:15px;cursor:pointer}
+.btn.wide{width:100%;margin-top:18px}
+.btn.ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border-strong)}
+.btn.small{min-height:40px;padding:0 14px;font-size:14px}
+.btn:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn:disabled{opacity:.5;cursor:default}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:22px 0 14px;border-bottom:1px solid var(--border)}
+.top .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 3px}
+.top .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px dotted var(--ink-faint)}
+.top h1{font-size:23px;letter-spacing:-.01em}
+.top-right{display:flex;align-items:center;gap:9px}
+.who{font-size:12.5px;color:var(--ink-soft)}
+
+.projbar{display:flex;gap:8px;overflow-x:auto;padding:14px 0 4px;scrollbar-width:none}
+.projbar::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:44px;padding:0 15px;border-radius:22px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink-soft);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip .n{font-family:var(--font-mono);font-size:11.5px;opacity:.75;font-variant-numeric:tabular-nums}
+
+.gauge{margin:18px 0 0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+.gauge-figs{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.gauge-now{display:flex;align-items:baseline;gap:8px}
+.gauge-now b{font-family:var(--font-display);font-size:42px;line-height:.9;font-variant-numeric:tabular-nums}
+.gauge-now span{font-size:15px;font-weight:600;color:var(--ink-soft)}
+.pace{font-size:13px;color:var(--ink-soft);text-align:right}
+.pace b{color:var(--ink);font-variant-numeric:tabular-nums}
+.ridge svg{display:block;width:100%;height:56px;margin-top:12px}
+.ridge-scale{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);margin-top:3px}
+
+.today{margin:16px 0 0;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.today-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:var(--accent-soft);border-bottom:1px solid var(--border)}
+.today-day{font-family:var(--font-display);font-size:24px;line-height:1}
+.today-phase{font-size:12.5px;color:var(--ink-soft);text-align:right;line-height:1.35}
+.today-body{padding:4px 16px 12px}
+
+.task{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid var(--border)}
+.task:last-child{border-bottom:0}
+.chk{appearance:none;-webkit-appearance:none;margin:1px 0 0;inline-size:26px;block-size:26px;border:1.5px solid var(--border-strong);border-radius:7px;background:var(--surface);cursor:pointer;position:relative;flex:none}
+.chk:checked{background:var(--accent);border-color:var(--accent)}
+.chk:checked::after{content:"";position:absolute;inset-inline-start:8px;inset-block-start:3px;inline-size:7px;block-size:13px;border:solid var(--accent-ink);border-width:0 2.5px 2.5px 0;transform:rotate(42deg)}
+.chk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.t-text{min-width:0}
+.t-title{font-size:15px;line-height:1.42;overflow-wrap:anywhere}
+.chk:checked~.t-text .t-title{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--border-strong)}
+.t-meta{display:flex;align-items:center;gap:9px;margin-top:5px;flex-wrap:wrap}
+.blaze{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+.blaze i{inline-size:13px;block-size:13px;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;flex:none}
+.blaze i::before{content:"";display:block}
+.blaze.cod i::before{inline-size:9px;block-size:9px;background:linear-gradient(var(--blaze-rosu),var(--blaze-rosu)) center/9px 3px no-repeat,linear-gradient(var(--blaze-rosu),var(--blaze-rosu)) center/3px 9px no-repeat}
+.blaze.continut i::before{inline-size:9px;block-size:3.5px;background:var(--blaze-albastru)}
+.blaze.marketing i::before{inline-size:0;block-size:0;border-inline:5px solid transparent;border-block-end:9px solid var(--blaze-galben)}
+.blaze.masurare i::before{inline-size:8px;block-size:8px;border-radius:50%;background:var(--blaze-punct)}
+.mins{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.t-del{background:none;border:0;color:var(--ink-faint);cursor:pointer;min-width:44px;min-height:44px;font-size:18px;line-height:1;padding:0}
+.t-del:hover{color:var(--danger)}
+
+.stage{margin:26px 0 0;border-block-start:2px solid var(--ink);padding-block-start:12px}
+.stage-head{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+.stage-num{font-family:var(--font-mono);font-size:11px;letter-spacing:.11em;color:var(--ink-faint)}
+.stage-name{font-size:26px;line-height:1}
+.stage-goal{margin-inline-start:auto;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.stage-note{margin:7px 0 0;color:var(--ink-soft);font-size:14px;max-width:62ch}
+.stage-bar{margin-top:11px;height:5px;border-radius:3px;background:var(--surface-2);border:1px solid var(--border);overflow:hidden}
+.stage-bar b{display:block;height:100%;background:var(--accent);inline-size:0}
+
+details.day{border-bottom:1px solid var(--border)}
+details.day>summary{display:flex;align-items:center;gap:11px;padding:12px 2px;cursor:pointer;list-style:none;min-block-size:46px}
+details.day>summary::-webkit-details-marker{display:none}
+.day-n{font-family:var(--font-mono);font-size:11.5px;font-weight:600;color:var(--ink-faint);inline-size:46px;flex:none;font-variant-numeric:tabular-nums}
+.day-sum{flex:1;min-width:0;font-size:14px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+details.day[open] .day-sum{white-space:normal;color:var(--ink)}
+.day-count{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);flex:none;font-variant-numeric:tabular-nums}
+.day-count.all{color:var(--accent)}
+.day-tasks{padding:0 2px 10px 12px}
+@media(min-width:520px){.day-tasks{padding-inline-start:57px}}
+
+.gate-note{margin:14px 0;padding:13px 15px;border:1px dashed var(--border-strong);border-radius:11px;background:var(--surface);font-size:14px;color:var(--ink-soft)}
+.gate-note b{display:block;font-family:var(--font-display);font-size:17px;color:var(--ink);margin-bottom:3px}
+
+.panel{margin:18px 0 0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+.panel h2{font-size:20px;margin-bottom:4px}
+.panel p.lead{margin:0 0 14px;color:var(--ink-soft);font-size:14px}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.row input[type=text],.row input[type=number]{flex:1 1 140px;min-inline-size:0;min-height:46px;padding:0 12px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface-2)}
+.row select{min-height:46px;padding:0 10px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface-2)}
+.empty{color:var(--ink-faint);font-size:14px;padding:14px 0}
+
+.log-list{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:7px;font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+.log-list li{display:flex;justify-content:space-between;gap:10px;color:var(--ink-soft);padding-block-end:6px;border-bottom:1px solid var(--border)}
+.log-list li b{color:var(--ink)}
+.status{margin-top:11px;font-size:13px;color:var(--ink-faint);min-height:19px}
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);font-size:12.5px;color:var(--ink-faint)}
+.legend{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:11px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <div class="gate-card">
+    <h2>Task &amp; Projects</h2>
+    <p class="gate-sub">Intri cu aceleași date ca în Your Voice.</p>
+    <form id="loginForm">
+      <label for="email">Adresă de e-mail</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="pw">Parolă</label>
+      <input id="pw" type="password" autocomplete="current-password" required>
+      <button class="btn wide" type="submit">Intră</button>
+      <p id="loginMsg" class="gate-msg"></p>
+    </form>
+  </div>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header class="top">
+    <div>
+      <p class="eyebrow"><a href="/">Your Voice</a></p>
+      <h1>Task &amp; Projects</h1>
+    </div>
+    <div class="top-right">
+      <span class="who" id="who"></span>
+      <button class="btn ghost small" id="logout" type="button">Ieși</button>
+    </div>
+  </header>
+
+  <nav class="projbar" id="projbar" aria-label="Proiecte"></nav>
+
+  <div id="planView">
+    <section class="gauge">
+      <div class="gauge-figs">
+        <div class="gauge-now"><b id="gNow">23</b><span>din 500 de utilizatori</span></div>
+        <div class="pace" id="gPace">Notează prima citire ca să vezi ritmul.</div>
+      </div>
+      <div class="ridge"><svg id="ridge" viewBox="0 0 700 56" preserveAspectRatio="none" aria-hidden="true"></svg></div>
+      <div class="ridge-scale"><span>z1 &middot; 23</span><span>z35 &middot; 120</span><span>z65 &middot; 220</span><span>z90 &middot; 500</span></div>
+    </section>
+
+    <section class="today">
+      <div class="today-head">
+        <div class="today-day" id="tDay">Ziua 1</div>
+        <div class="today-phase" id="tPhase"></div>
+      </div>
+      <div class="today-body" id="tBody"></div>
+    </section>
+
+    <div id="stages"></div>
+
+    <section class="panel">
+      <h2>Cât ai ajuns</h2>
+      <p class="lead">Notează numărul real de utilizatori o dată pe săptămână.</p>
+      <div class="row">
+        <input id="logCount" type="number" inputmode="numeric" min="0" placeholder="Utilizatori acum" aria-label="Număr de utilizatori">
+        <button class="btn" id="logBtn" type="button">Notează</button>
+      </div>
+      <ul class="log-list" id="logList"></ul>
+    </section>
+  </div>
+
+  <div id="customView" hidden>
+    <section class="panel">
+      <h2 id="cName">Proiect</h2>
+      <p class="lead">Sarcinile tale pentru acest proiect.</p>
+      <div id="cTasks"></div>
+      <div class="row" style="margin-top:14px">
+        <input id="cNew" type="text" placeholder="Sarcină nouă" aria-label="Sarcină nouă" maxlength="200">
+        <select id="cCat" aria-label="Categorie">
+          <option value="c">cod</option>
+          <option value="t">conținut</option>
+          <option value="m">marketing</option>
+          <option value="s">măsurare</option>
+        </select>
+        <input id="cMin" type="number" min="5" max="480" step="5" value="30" aria-label="Minute" style="flex:0 0 92px">
+        <button class="btn" id="cAdd" type="button">Adaugă</button>
+      </div>
+      <div class="row" style="margin-top:18px">
+        <button class="btn ghost small" id="cDelete" type="button">Șterge proiectul</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Proiect nou</h2>
+    <p class="lead">Pentru orice altceva în afara planului de 90 de zile.</p>
+    <div class="row">
+      <input id="pNew" type="text" placeholder="Numele proiectului" aria-label="Numele proiectului" maxlength="60">
+      <button class="btn" id="pAdd" type="button">Creează</button>
+    </div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <footer>
+    <div class="legend">
+      <span class="blaze cod"><i></i>cod</span>
+      <span class="blaze continut"><i></i>conținut</span>
+      <span class="blaze marketing"><i></i>marketing</span>
+      <span class="blaze masurare"><i></i>măsurare</span>
+    </div>
+    Marcajele urmează convenția potecilor din România. Datele se salvează în contul tău.
+  </footer>
+</div>
+
+<script>
+var STAGES = [];
+var PLAN = {};
+
+var CAT = { c:["cod","cod"], t:["continut","conținut"], m:["marketing","marketing"], s:["masurare","măsurare"] };
+var TARGET = 500, START_USERS = 23;
+var PLAN_ID = "__plan90";
+
+var state = { projects: [], done: {}, log: [], start_date: null };
+var active = PLAN_ID;
+var saveTimer = null;
+
+function $(id) { return document.getElementById(id); }
+function setStatus(m) { $("status").textContent = m; }
+
+async function api(path, opts) {
+  var r = await fetch(path, Object.assign({ credentials: "same-origin" }, opts));
+  var data = await r.json().catch(function () { return {}; });
+  return { status: r.status, data: data };
+}
+
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async function () {
+    var r = await api("/api/state", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(state),
+    }).catch(function () { return { status: 0, data: {} }; });
+    setStatus(r.status === 200 ? "Salvat." : (r.data.message || "Nu s-a putut salva."));
+  }, 500);
+}
+
+function todayIndex() {
+  if (!state.start_date) return 1;
+  var ms = Date.now() - new Date(state.start_date).getTime();
+  return Math.min(90, Math.max(1, Math.floor(ms / 86400000) + 1));
+}
+function stageOf(d) {
+  for (var i = 0; i < STAGES.length; i++) if (d >= STAGES[i].from && d <= STAGES[i].to) return STAGES[i];
+  return STAGES[STAGES.length - 1] || { n: 1, name: "" };
+}
+function dayOfDate(iso) {
+  if (!state.start_date) return 1;
+  return Math.floor((new Date(iso) - new Date(state.start_date)) / 86400000) + 1;
+}
+function startIfNeeded() {
+  if (!state.start_date) { state.start_date = new Date().toISOString(); renderToday(); renderLog(); }
+}
+
+function taskEl(id, title, cat, mins, onDelete) {
+  var row = document.createElement("label");
+  row.className = "task";
+
+  var box = document.createElement("input");
+  box.type = "checkbox";
+  box.className = "chk";
+  box.checked = !!state.done[id];
+  box.addEventListener("change", function () {
+    if (box.checked) state.done[id] = true; else delete state.done[id];
+    startIfNeeded();
+    save();
+    paintCounts();
+  });
+
+  var text = document.createElement("div");
+  text.className = "t-text";
+  var t = document.createElement("div");
+  t.className = "t-title";
+  t.textContent = title;
+  var meta = document.createElement("div");
+  meta.className = "t-meta";
+  var c = CAT[cat] || CAT.c;
+  meta.innerHTML = '<span class="blaze ' + c[0] + '"><i></i>' + c[1] + '</span><span class="mins">' + mins + ' min</span>';
+  text.appendChild(t);
+  text.appendChild(meta);
+  row.appendChild(box);
+  row.appendChild(text);
+
+  if (onDelete) {
+    var del = document.createElement("button");
+    del.type = "button";
+    del.className = "t-del";
+    del.setAttribute("aria-label", "Șterge sarcina");
+    del.textContent = "×";
+    del.addEventListener("click", function (e) { e.preventDefault(); onDelete(); });
+    row.appendChild(del);
+  }
+  return row;
+}
+
+function dayTasksEl(day) {
+  var box = document.createElement("div");
+  var list = PLAN[day] || [];
+  for (var i = 0; i < list.length; i++) {
+    box.appendChild(taskEl("d" + day + "t" + i, list[i][0], list[i][1], list[i][2]));
+  }
+  return box;
+}
+
+function renderToday() {
+  var day = todayIndex(), st = stageOf(day);
+  $("tDay").textContent = "Ziua " + day;
+  $("tPhase").innerHTML = "Etapa " + st.n + " &middot; " + st.name +
+    (state.start_date ? "" : "<br>Bifează ca să pornești numărătoarea");
+  var b = $("tBody");
+  b.textContent = "";
+  b.appendChild(dayTasksEl(day));
+}
+
+var GATES = {
+  1: ["Prag la ziua 14", "Dacă rata de completare a profilului n-a urcat peste 70%, nu treci mai departe."],
+  2: ["Prag la ziua 35", "Sub 75% profiluri complete sau mai puțin de 5 expediții publicate — întoarce-te la faza 1."],
+  3: ["Prag la ziua 65", "Dacă traficul din Google nu crește, mută tot efortul pe contact direct."]
+};
+
+function renderStages() {
+  var host = $("stages");
+  host.textContent = "";
+  STAGES.forEach(function (st) {
+    var sec = document.createElement("section");
+    sec.className = "stage";
+    sec.innerHTML =
+      '<div class="stage-head"><span class="stage-num">ETAPA ' + st.n + '</span>' +
+      '<h2 class="stage-name"></h2>' +
+      '<span class="stage-goal"></span></div>' +
+      '<p class="stage-note"></p><div class="stage-bar"><b data-stage="' + st.n + '"></b></div>';
+    sec.querySelector(".stage-name").textContent = st.name;
+    sec.querySelector(".stage-goal").textContent = "zilele " + st.from + "–" + st.to + " · " + st.goal;
+    sec.querySelector(".stage-note").textContent = st.note;
+
+    for (var d = st.from; d <= st.to; d++) {
+      var det = document.createElement("details");
+      det.className = "day";
+      var sum = document.createElement("summary");
+      var tasks = PLAN[d] || [];
+      sum.innerHTML = '<span class="day-n">ZIUA ' + d + '</span><span class="day-sum"></span>' +
+        '<span class="day-count" data-count="' + d + '"></span>';
+      sum.querySelector(".day-sum").textContent = tasks.map(function (t) { return t[0]; }).join(" · ");
+      var body = document.createElement("div");
+      body.className = "day-tasks";
+      body.appendChild(dayTasksEl(d));
+      det.appendChild(sum);
+      det.appendChild(body);
+      sec.appendChild(det);
+    }
+
+    if (GATES[st.n]) {
+      var g = document.createElement("div");
+      g.className = "gate-note";
+      g.innerHTML = "<b></b>";
+      g.querySelector("b").textContent = GATES[st.n][0];
+      g.appendChild(document.createTextNode(GATES[st.n][1]));
+      sec.appendChild(g);
+    }
+    host.appendChild(sec);
+  });
+}
+
+function paintCounts() {
+  for (var d = 1; d <= 90; d++) {
+    var tasks = PLAN[d] || [];
+    var done = 0;
+    for (var i = 0; i < tasks.length; i++) if (state.done["d" + d + "t" + i]) done++;
+    var cells = document.querySelectorAll('[data-count="' + d + '"]');
+    for (var k = 0; k < cells.length; k++) {
+      cells[k].textContent = done + "/" + tasks.length;
+      cells[k].classList.toggle("all", tasks.length > 0 && done === tasks.length);
+    }
+  }
+  STAGES.forEach(function (st) {
+    var total = 0, done = 0;
+    for (var d = st.from; d <= st.to; d++) {
+      var tasks = PLAN[d] || [];
+      total += tasks.length;
+      for (var i = 0; i < tasks.length; i++) if (state.done["d" + d + "t" + i]) done++;
+    }
+    var b = document.querySelector('[data-stage="' + st.n + '"]');
+    if (b) b.style.inlineSize = (total ? (done / total) * 100 : 0) + "%";
+  });
+  renderProjbar();
+}
+
+function renderRidge() {
+  var W = 700, H = 56, pad = 3;
+  var plan = [[1,23],[14,40],[35,120],[65,220],[90,500]];
+  function x(d) { return ((d - 1) / 89) * W; }
+  function y(u) { return H - pad - (u / TARGET) * (H - pad * 2); }
+  var planPath = plan.map(function (p, i) {
+    return (i ? "L" : "M") + x(p[0]).toFixed(1) + " " + y(p[1]).toFixed(1);
+  }).join(" ");
+  var real = "";
+  if (state.log.length) {
+    var pts = [[1, START_USERS]].concat(state.log.map(function (e) { return [dayOfDate(e.date), e.count]; }))
+      .filter(function (p) { return p[0] >= 1; })
+      .sort(function (a, b) { return a[0] - b[0]; });
+    real = pts.map(function (p, i) {
+      return (i ? "L" : "M") + x(Math.min(90, p[0])).toFixed(1) + " " + y(Math.min(TARGET, p[1])).toFixed(1);
+    }).join(" ");
+  }
+  $("ridge").innerHTML =
+    '<path d="' + planPath + '" fill="none" stroke="var(--border-strong)" stroke-width="1.5" stroke-dasharray="4 4"/>' +
+    (real ? '<path d="' + real + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>' : "");
+}
+
+function renderLog() {
+  var ul = $("logList");
+  ul.textContent = "";
+  state.log.slice().reverse().forEach(function (e) {
+    var li = document.createElement("li");
+    li.innerHTML = "<span></span><b></b>";
+    li.querySelector("span").textContent = "ziua " + dayOfDate(e.date) + " · " +
+      new Date(e.date).toLocaleDateString("ro-RO", { day: "2-digit", month: "short" });
+    li.querySelector("b").textContent = e.count;
+    ul.appendChild(li);
+  });
+  var last = state.log.length ? state.log[state.log.length - 1].count : START_USERS;
+  $("gNow").textContent = last;
+  if (state.log.length) {
+    var left = Math.max(1, 90 - todayIndex());
+    var need = Math.max(0, TARGET - last);
+    $("gPace").innerHTML = "Îți mai trebuie <b>" + need + "</b> în <b>" + left +
+      "</b> zile — <b>" + (need / left).toFixed(1) + "</b> pe zi.";
+  }
+  renderRidge();
+}
+
+function projectDone(p) {
+  var done = 0;
+  p.tasks.forEach(function (t) { if (state.done[t.id]) done++; });
+  return done;
+}
+
+function renderProjbar() {
+  var bar = $("projbar");
+  bar.textContent = "";
+  var planDone = 0, planTotal = 0;
+  for (var d = 1; d <= 90; d++) {
+    var t = PLAN[d] || [];
+    planTotal += t.length;
+    for (var i = 0; i < t.length; i++) if (state.done["d" + d + "t" + i]) planDone++;
+  }
+  var items = [{ id: PLAN_ID, name: "Planul de 90 de zile", done: planDone, total: planTotal }]
+    .concat(state.projects.map(function (p) {
+      return { id: p.id, name: p.name, done: projectDone(p), total: p.tasks.length };
+    }));
+
+  items.forEach(function (it) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (it.id === active ? " on" : "");
+    b.innerHTML = '<span></span><span class="n"></span>';
+    b.querySelector("span").textContent = it.name;
+    b.querySelector(".n").textContent = it.done + "/" + it.total;
+    b.addEventListener("click", function () { active = it.id; renderActive(); });
+    bar.appendChild(b);
+  });
+}
+
+function renderCustom() {
+  var p = null;
+  state.projects.forEach(function (x) { if (x.id === active) p = x; });
+  if (!p) { active = PLAN_ID; renderActive(); return; }
+  $("cName").textContent = p.name;
+  var host = $("cTasks");
+  host.textContent = "";
+  if (!p.tasks.length) {
+    var e = document.createElement("p");
+    e.className = "empty";
+    e.textContent = "Niciun task încă. Adaugă primul mai jos.";
+    host.appendChild(e);
+  }
+  p.tasks.forEach(function (t) {
+    host.appendChild(taskEl(t.id, t.title, t.cat, t.mins, function () {
+      p.tasks = p.tasks.filter(function (x) { return x.id !== t.id; });
+      delete state.done[t.id];
+      save();
+      renderActive();
+    }));
+  });
+}
+
+function renderActive() {
+  var isPlan = active === PLAN_ID;
+  $("planView").hidden = !isPlan;
+  $("customView").hidden = isPlan;
+  if (isPlan) { renderToday(); renderLog(); } else { renderCustom(); }
+  renderProjbar();
+}
+
+$("logBtn").addEventListener("click", function () {
+  var n = parseInt($("logCount").value, 10);
+  if (!isFinite(n) || n < 0) { setStatus("Scrie un număr."); return; }
+  startIfNeeded();
+  state.log.push({ date: new Date().toISOString(), count: n });
+  $("logCount").value = "";
+  save();
+  renderLog();
+});
+
+$("pAdd").addEventListener("click", function () {
+  var name = $("pNew").value.trim();
+  if (!name) { setStatus("Scrie un nume."); return; }
+  var id = "p" + Date.now().toString(36);
+  state.projects.push({ id: id, name: name, tasks: [] });
+  $("pNew").value = "";
+  active = id;
+  save();
+  renderActive();
+});
+
+$("cAdd").addEventListener("click", function () {
+  var p = null;
+  state.projects.forEach(function (x) { if (x.id === active) p = x; });
+  if (!p) return;
+  var title = $("cNew").value.trim();
+  if (!title) return;
+  var mins = Math.min(480, Math.max(5, parseInt($("cMin").value, 10) || 30));
+  p.tasks.push({ id: "t" + Date.now().toString(36), title: title, cat: $("cCat").value, mins: mins });
+  $("cNew").value = "";
+  save();
+  renderActive();
+});
+
+$("cDelete").addEventListener("click", function () {
+  var p = null;
+  state.projects.forEach(function (x) { if (x.id === active) p = x; });
+  if (!p) return;
+  p.tasks.forEach(function (t) { delete state.done[t.id]; });
+  state.projects = state.projects.filter(function (x) { return x.id !== p.id; });
+  active = PLAN_ID;
+  save();
+  renderActive();
+});
+
+$("logout").addEventListener("click", async function () {
+  await api("/api/auth?action=logout", { method: "POST" });
+  location.href = "/";
+});
+
+$("loginForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  var msg = $("loginMsg");
+  msg.className = "gate-msg";
+  msg.textContent = "Se verifică…";
+  var controls = e.target.querySelectorAll("input,button");
+  for (var i = 0; i < controls.length; i++) controls[i].disabled = true;
+  var r = await api("/api/auth?action=login", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email: $("email").value.trim(), password: $("pw").value }),
+  }).catch(function () { return { status: 0, data: {} }; });
+  if (r.status === 200) { location.reload(); return; }
+  for (var k = 0; k < controls.length; k++) controls[k].disabled = false;
+  msg.className = "gate-msg bad";
+  msg.textContent = r.data.message || "Autentificare eșuată.";
+});
+
+(async function boot() {
+  var me = await api("/api/auth?action=me").catch(function () { return { data: {} }; });
+  if (!me.data || !me.data.authenticated) return;
+
+  $("who").textContent = me.data.email || "";
+  $("gate").hidden = true;
+  $("app").hidden = false;
+
+  var got = await api("/api/state").catch(function () { return { status: 0, data: {} }; });
+  if (got.status === 200 && got.data) {
+    state.projects = Array.isArray(got.data.projects) ? got.data.projects : [];
+    state.done = got.data.done && typeof got.data.done === "object" ? got.data.done : {};
+    state.log = Array.isArray(got.data.log) ? got.data.log : [];
+    state.start_date = got.data.start_date || null;
+    STAGES = Array.isArray(got.data.stages) ? got.data.stages : [];
+    PLAN = got.data.days && typeof got.data.days === "object" ? got.data.days : {};
+  } else {
+    setStatus("Nu am putut citi datele salvate.");
+  }
+  renderStages();
+  renderActive();
+  paintCounts();
+})();
+</script>
+</body>
+</html>
