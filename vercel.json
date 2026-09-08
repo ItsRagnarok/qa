@@ -1,12 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/mail.js": { "maxDuration": 30 }
+    "api/mail.js": { "maxDuration": 30 },
+    "api/organize.js": { "maxDuration": 25 },
+    "api/monthly-summary.js": { "maxDuration": 25 }
   },
   "rewrites": [
     { "source": "/api/plan-get", "destination": "/api/plan?op=get" },
     { "source": "/api/plan-toggle", "destination": "/api/plan?op=toggle" },
-    { "source": "/api/plan-approve", "destination": "/api/plan?op=approve" }
+    { "source": "/api/plan-approve", "destination": "/api/plan?op=approve" },
+    { "source": "/api/vehicul", "destination": "https://scadentar.vercel.app/api/vehicul" },
+    { "source": "/api/verifica", "destination": "https://scadentar.vercel.app/api/verifica" }
   ],
   "headers": [
     {

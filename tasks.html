@@ -154,7 +154,7 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);font-
 </head>
 <body>
 
-<div id="gate" class="gate">
+<div id="gate" class="gate" hidden>
   <div class="gate-card">
     <h2>Task &amp; Projects</h2>
     <p class="gate-sub">Intri cu aceleași date ca în Your Voice.</p>
@@ -617,7 +617,7 @@ $("loginForm").addEventListener("submit", async function (e) {
 
 (async function boot() {
   var me = await api("/api/auth?action=me").catch(function () { return { data: {} }; });
-  if (!me.data || !me.data.authenticated) return;
+  if (!me.data || !me.data.authenticated) { $("gate").hidden = false; return; }
 
   $("who").textContent = me.data.email || "";
   $("gate").hidden = true;

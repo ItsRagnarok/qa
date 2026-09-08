@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Verificare ITP, RCA si rovinieta dupa numar de inmatriculare si VIN.">
+<title>Scadențar Auto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap">
+<style>
+:root{
+  --ground:#f4f6f9; --surface:#ffffff; --surface-2:#fafbfd;
+  --ink:#141922; --ink-2:#59636f; --ink-3:#8a939e;
+  --line:#dde2e9; --line-strong:#c3cbd6;
+  --accent:#003399; --accent-soft:#e7edf8;
+  --ok:#116b41;   --ok-bg:#e6f4ec;  --ok-line:#a4d5ba;
+  --warn:#875505; --warn-bg:#fdf2df; --warn-line:#e5c586;
+  --bad:#a3231b;  --bad-bg:#fdeae8;  --bad-line:#eeb2ab;
+  --none:#5a646f; --none-bg:#eef1f5; --none-line:#d2d8e0;
+  --shadow:0 1px 2px rgba(20,25,34,.05), 0 8px 24px -18px rgba(20,25,34,.35);
+  --plate-blue:#003399;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#10141a; --surface:#181d25; --surface-2:#1d232c;
+    --ink:#e9edf3; --ink-2:#a2acb9; --ink-3:#78828f;
+    --line:#293039; --line-strong:#3a424e;
+    --accent:#84a9ff; --accent-soft:#1a2540;
+    --ok:#5fc590;   --ok-bg:#132619;  --ok-line:#2e5a40;
+    --warn:#e2af57; --warn-bg:#2a2012; --warn-line:#5b4923;
+    --bad:#f28c81;  --bad-bg:#2c1716;  --bad-line:#5f322e;
+    --none:#98a3af; --none-bg:#1e242c; --none-line:#333c46;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.8);
+    --plate-blue:#12306e;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#10141a; --surface:#181d25; --surface-2:#1d232c;
+  --ink:#e9edf3; --ink-2:#a2acb9; --ink-3:#78828f;
+  --line:#293039; --line-strong:#3a424e;
+  --accent:#84a9ff; --accent-soft:#1a2540;
+  --ok:#5fc590;   --ok-bg:#132619;  --ok-line:#2e5a40;
+  --warn:#e2af57; --warn-bg:#2a2012; --warn-line:#5b4923;
+  --bad:#f28c81;  --bad-bg:#2c1716;  --bad-line:#5f322e;
+  --none:#98a3af; --none-bg:#1e242c; --none-line:#333c46;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.8);
+  --plate-blue:#12306e;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased}
+.wrap{max-width:940px; margin:0 auto; padding:28px 20px 64px}
+
+.top{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap}
+h1{font-family:"IBM Plex Sans Condensed",system-ui,sans-serif; font-weight:700;
+   font-size:30px; letter-spacing:-.01em; margin:0; text-wrap:balance}
+.sub{color:var(--ink-2); font-size:14px; margin:5px 0 0; max-width:58ch}
+.today{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12px;
+       color:var(--ink-3); letter-spacing:.02em; white-space:nowrap}
+
+.banner{margin:20px 0 0; padding:13px 16px; border-radius:9px; font-size:13.5px;
+        border:1px solid var(--warn-line); background:var(--warn-bg); color:var(--warn)}
+.banner b{font-weight:600}
+.banner code{font-family:"IBM Plex Mono",monospace; font-size:12.5px; background:var(--surface);
+             border:1px solid var(--warn-line); padding:1px 5px; border-radius:4px; color:var(--ink)}
+.banner a{color:inherit}
+.banner.ok{border-color:var(--ok-line); background:var(--ok-bg); color:var(--ok)}
+.banner.ok code{border-color:var(--ok-line)}
+.banner ol{margin:9px 0 0; padding-left:20px}
+.banner li{margin:3px 0}
+
+.strip{display:flex; gap:8px; flex-wrap:wrap; margin:20px 0 0}
+.chip{display:flex; align-items:baseline; gap:7px; padding:7px 13px; border-radius:7px;
+      cursor:pointer; border:1px solid var(--line); background:var(--surface);
+      color:var(--ink-2); font:inherit; font-size:13px}
+.chip b{font-family:"IBM Plex Mono",monospace; font-size:15px; font-weight:600; font-variant-numeric:tabular-nums}
+.chip:hover{border-color:var(--line-strong)}
+.chip[aria-pressed="true"]{box-shadow:inset 0 0 0 1px currentColor}
+.chip.k-bad{color:var(--bad); background:var(--bad-bg); border-color:var(--bad-line)}
+.chip.k-warn{color:var(--warn); background:var(--warn-bg); border-color:var(--warn-line)}
+.chip.k-none{color:var(--none); background:var(--none-bg); border-color:var(--none-line)}
+.chip.k-ok{color:var(--ok); background:var(--ok-bg); border-color:var(--ok-line)}
+.chip.k-lipsa{color:var(--bad); background:var(--bad-bg); border-color:var(--bad-line)}
+
+.bar{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:18px 0 0}
+.btn{font:inherit; font-size:14px; font-weight:500; cursor:pointer; padding:9px 15px;
+     border-radius:7px; border:1px solid transparent; background:var(--accent); color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.45; cursor:not-allowed; filter:none}
+.btn-ghost{background:transparent; color:var(--ink-2); border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--line-strong); color:var(--ink); filter:none}
+.count{font-size:13px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+
+:where(a,button,input):focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+form.add{margin:16px 0 0; padding:18px; background:var(--surface); border:1px solid var(--line);
+         border-radius:10px; box-shadow:var(--shadow); display:grid; gap:15px}
+.row3{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+label.f{display:grid; gap:5px}
+.f > span{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:600; font-size:11px;
+          letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3)}
+.f input{font:inherit; font-size:15px; padding:9px 10px; color:var(--ink);
+         background:var(--surface-2); border:1px solid var(--line); border-radius:6px}
+.f input::placeholder{color:var(--ink-3)}
+.f input.up{text-transform:uppercase; font-family:"IBM Plex Mono",monospace; letter-spacing:.04em}
+.hint{margin:0; font-size:13px; color:var(--ink-3)}
+.err{margin:14px 0 0; padding:10px 13px; border-radius:7px; font-size:14px;
+     background:var(--bad-bg); color:var(--bad); border:1px solid var(--bad-line)}
+
+.list{display:grid; gap:12px; margin:24px 0 0}
+.veh{background:var(--surface); border:1px solid var(--line); border-radius:10px;
+     box-shadow:var(--shadow); overflow:hidden; display:grid; grid-template-columns:5px 1fr}
+.sev{background:var(--none-line)}
+.veh.s-bad .sev{background:var(--bad)}
+.veh.s-lipsa .sev{background:var(--bad)}
+.veh.s-warn .sev{background:var(--warn)}
+.veh.s-ok .sev{background:var(--ok)}
+.veh.busy{opacity:.6}
+.body{min-width:0}
+.who{min-width:0; flex:1}
+.vin{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3);
+     letter-spacing:.03em; overflow-wrap:anywhere}
+.vin em{font-style:normal; color:var(--warn)}
+.acts{display:flex; align-items:center; gap:7px}
+.mini{border:1px solid var(--line); background:transparent; color:var(--ink-2); border-radius:6px;
+      padding:5px 10px; cursor:pointer; font:inherit; font-size:12.5px}
+.mini:hover{border-color:var(--line-strong); color:var(--ink)}
+.mini.del{width:30px; padding:0; height:29px; font-size:17px; line-height:1}
+.mini.del:hover{color:var(--bad); border-color:var(--bad-line); background:var(--bad-bg)}
+
+.plate{display:inline-flex; align-items:stretch; flex:0 0 auto;
+       border:1.5px solid #23282f; border-radius:5px; overflow:hidden; background:#fff}
+.plate .eu{background:var(--plate-blue); color:#fff; display:flex; flex-direction:column;
+           align-items:center; justify-content:flex-end; padding-bottom:4px;
+           font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:700}
+.plate .eu i{display:block; border-radius:50%; border:1.5px dotted #ffcc00}
+.plate .nr{display:flex; align-items:center; color:#111;
+           font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:700; white-space:nowrap}
+
+.note{padding:9px 16px; font-size:12.5px; border-bottom:1px solid var(--line);
+      background:var(--warn-bg); color:var(--warn)}
+.docs{display:grid; grid-template-columns:repeat(3,1fr)}
+.doc{padding:13px 16px; border-left:1px solid var(--line); min-width:0}
+.doc:first-child{border-left:0}
+.dtop{display:flex; align-items:center; justify-content:space-between; gap:8px}
+.dname{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:600; font-size:12px;
+       letter-spacing:.09em; text-transform:uppercase; color:var(--ink-2)}
+.pill{font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; border:1px solid; white-space:nowrap}
+.p-ok{color:var(--ok); background:var(--ok-bg); border-color:var(--ok-line)}
+.p-warn{color:var(--warn); background:var(--warn-bg); border-color:var(--warn-line)}
+.p-bad{color:var(--bad); background:var(--bad-bg); border-color:var(--bad-line)}
+.p-none{color:var(--none); background:var(--none-bg); border-color:var(--none-line)}
+.until{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:19px;
+       font-weight:500; margin:9px 0 1px; letter-spacing:-.01em}
+.until.empty{color:var(--ink-3); font-size:16px}
+.left{font-size:12.5px; color:var(--ink-2)}
+.left.bad{color:var(--bad); font-weight:500}
+.left.warn{color:var(--warn); font-weight:500}
+.detaliu{font-size:12px; color:var(--ink-3); margin-top:3px; overflow-wrap:anywhere}
+.edit{display:flex; align-items:center; gap:8px; margin-top:9px}
+.edit input{font:inherit; font-family:"IBM Plex Mono",monospace; font-size:12.5px; padding:5px 7px;
+            color:var(--ink-2); width:100%; background:transparent; border:1px solid transparent; border-radius:5px}
+.edit input:hover{border-color:var(--line); background:var(--surface-2)}
+.edit input:focus{border-color:var(--accent); background:var(--surface-2); color:var(--ink)}
+.src{font-size:11.5px; color:var(--ink-3); text-decoration:none; white-space:nowrap;
+     border-bottom:1px solid var(--line)}
+.src:hover{color:var(--accent); border-color:var(--accent)}
+
+.empty-state{padding:42px 24px; text-align:center; color:var(--ink-2);
+             border:1px dashed var(--line-strong); border-radius:10px; font-size:14px}
+.foot{margin:30px 0 0; padding-top:18px; border-top:1px solid var(--line);
+      font-size:12.5px; color:var(--ink-3)}
+.foot p{margin:0 0 8px}
+.limit{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:14px}
+.limit input{font-family:"IBM Plex Mono",monospace; font-size:13px; width:64px; padding:5px 8px;
+             background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:6px}
+
+/* ---------- card compact, cu poza ---------- */
+.head{display:flex; align-items:center; gap:11px; flex-wrap:wrap; padding:9px 12px;
+      border-bottom:1px solid var(--line)}
+.poza{width:60px; height:44px; flex:0 0 auto; border-radius:6px; overflow:hidden;
+      border:1px solid var(--line); background:var(--surface-2);
+      display:flex; align-items:center; justify-content:center}
+.poza img{width:100%; height:100%; object-fit:cover; display:block}
+.poza span{font-family:"IBM Plex Sans Condensed",sans-serif; font-size:9px; font-weight:600;
+           letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); text-align:center}
+.plate{height:32px}
+.plate .nr{font-size:17px; padding:0 8px; letter-spacing:.07em}
+.plate .eu{width:17px; font-size:8.5px}
+.plate .eu i{width:9px; height:9px; margin-bottom:2px; border-width:1px}
+.nick{font-weight:500; font-size:14px}
+.dmini{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+.dm{display:flex; flex-direction:column; gap:1px; padding:4px 9px; border-radius:6px;
+    border:1px solid; min-width:78px;
+    font-family:"IBM Plex Sans Condensed",sans-serif; font-size:10px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase}
+.dm b{font-family:"IBM Plex Mono",monospace; font-size:12.5px; font-weight:500;
+      letter-spacing:0; text-transform:none; font-variant-numeric:tabular-nums}
+.dm i{font-style:normal; font-size:9.5px; font-weight:400; letter-spacing:0; text-transform:none; opacity:.9}
+details.mai{border-top:1px solid var(--line)}
+details.mai > summary{list-style:none; cursor:pointer; padding:7px 12px; font-size:12px; color:var(--ink-3)}
+details.mai > summary::-webkit-details-marker{display:none}
+details.mai > summary:hover{color:var(--ink)}
+details.mai[open] > summary{border-bottom:1px solid var(--line)}
+@media (max-width:720px){ .dmini{margin-left:0; width:100%} }
+@media (max-width:640px){
+  .docs{grid-template-columns:1fr}
+  .doc{border-left:0; border-top:1px solid var(--line)}
+  .doc:first-child{border-top:0}
+  h1{font-size:25px}
+}
+/* ---------- destinatarii alertelor ---------- */
+.panou{margin:16px 0 0; padding:16px; background:var(--surface); border:1px solid var(--line);
+       border-radius:10px; box-shadow:var(--shadow)}
+.panou h2{font-family:"IBM Plex Sans Condensed",sans-serif; font-size:13px; font-weight:600;
+          letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); margin:0 0 4px}
+.panou p{margin:0 0 12px; font-size:13px; color:var(--ink-2)}
+.chips{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px}
+.mail{display:inline-flex; align-items:center; gap:7px; padding:4px 6px 4px 11px; border-radius:20px;
+      background:var(--accent-soft); border:1px solid var(--line); color:var(--ink);
+      font-family:"IBM Plex Mono",monospace; font-size:12.5px}
+.mail button{border:0; background:transparent; color:var(--ink-3); cursor:pointer;
+             font-size:15px; line-height:1; padding:0 2px; border-radius:50%}
+.mail button:hover{color:var(--bad)}
+.gol{font-size:13px; color:var(--ink-3); font-style:italic}
+.adauga-mail{display:flex; gap:8px; flex-wrap:wrap}
+.adauga-mail input{flex:1; min-width:220px; font:inherit; font-size:14px; padding:8px 10px;
+                   color:var(--ink); background:var(--surface-2);
+                   border:1px solid var(--line); border-radius:6px}
+.cine{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 16px;
+      border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-3)}
+.cine .mail{font-size:11.5px; padding:2px 5px 2px 9px}
+@media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <a href="/" style="display:inline-block;margin-bottom:8px;font-size:12px;opacity:.6;text-decoration:none;color:inherit">← Aplicații</a>
+      <h1>Scadențar Auto</h1>
+      <p class="sub">Pui numărul de înmatriculare și VIN-ul. Rovinieta se verifică gratuit la CNAIR, iar RCA prin furnizorul configurat.</p>
+    </div>
+    <div class="today" id="azi"></div>
+  </header>
+
+  <div id="banner"></div>
+  <div class="strip" id="strip"></div>
+
+  <div class="bar">
+    <button class="btn" id="btn-add">+ Adaugă mașină</button>
+    <button class="btn btn-ghost" id="btn-all">Verifică toate</button>
+    <button class="btn btn-ghost" id="btn-alerte">Cine primește alertele</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <section class="panou" id="panou-alerte" hidden>
+    <h2>Cine primește alertele</h2>
+    <p>Adresele de aici primesc alerte pentru toate mașinile. Poți adăuga mai multe deodată,
+       separate prin virgulă. Fiecare mașină poate avea în plus adresele ei.</p>
+    <div class="chips" id="chips-generale"></div>
+    <div class="adauga-mail">
+      <input id="input-mail" type="text" placeholder="ion@firma.ro, sofer@firma.ro"
+             aria-label="Adaugă adrese de email pentru alerte">
+      <button class="btn" id="btn-mail">Adaugă</button>
+      <button class="btn btn-ghost" id="btn-ics">Descarcă alertele în calendar</button>
+    </div>
+    <p class="hint" id="nota-alerte" style="margin:12px 0 0"></p>
+  </section>
+
+  <p class="err" id="err" hidden></p>
+
+  <form class="add" id="form" hidden>
+    <div class="row3">
+      <label class="f"><span>Nume (opțional)</span>
+        <input name="nume" placeholder="Duba de livrări" maxlength="40"></label>
+      <label class="f"><span>Număr de înmatriculare</span>
+        <input name="numar" class="up" placeholder="B123ABC" required maxlength="10"></label>
+      <label class="f"><span>VIN, 17 caractere</span>
+        <input name="vin" class="up" placeholder="WVWZZZ1JZXW000001" maxlength="17"></label>
+    </div>
+    <p class="hint">VIN-ul este seria de șasiu, cele 17 caractere de pe talon la rubrica E.</p>
+    <div class="bar" style="margin:0">
+      <button class="btn" type="submit">Adaugă și verifică</button>
+      <button class="btn btn-ghost" type="button" id="btn-cancel">Renunță</button>
+    </div>
+  </form>
+
+  <div class="list" id="list"></div>
+
+  <footer class="foot">
+    <p>Lista mașinilor rămâne în acest browser. Verificarea se face pe server.</p>
+    <p>Rovinieta vine din endpointul public al CNAIR. RCA vine de la furnizorul configurat, cu sursa și ora scrise pe card. ITP nu are sursă gratuită, RAR cere cod din imagine. Poza vine de pe Wikipedia, marca din VIN prin baza publică NHTSA.</p>
+    <div class="limit">
+      <label class="f" style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px">Limită mașini</span>
+        <input type="number" id="limita" min="1" max="200" step="1">
+      </label>
+      <span>Ridic-o oricând, când crește parcul auto.</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* generat din alerte.js de build.py, nu edita aici */
+(function (global) {
+  'use strict';
+
+  function emailValid(brut) {
+    const s = String(brut == null ? '' : brut).trim();
+    if (s.length < 6 || s.length > 254) return false;
+    if (/\s/.test(s)) return false;
+    const parti = s.split('@');
+    if (parti.length !== 2) return false;
+    const [local, domeniu] = parti;
+    if (!local || local.length > 64) return false;
+    if (/^\.|\.$|\.\./.test(local)) return false;
+    if (!/^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+$/.test(local)) return false;
+    if (!domeniu || domeniu.length > 253) return false;
+    if (/^[.-]|[.-]$|\.\./.test(domeniu)) return false;
+    if (!/^[A-Za-z0-9.-]+$/.test(domeniu)) return false;
+    const etichete = domeniu.split('.');
+    if (etichete.length < 2) return false;
+    if (etichete.some((e) => !e || e.length > 63 || /^-|-$/.test(e))) return false;
+    if (!/^[A-Za-z]{2,}$/.test(etichete[etichete.length - 1])) return false;
+    return true;
+  }
+
+  function normalizeazaEmail(brut) {
+    return String(brut == null ? '' : brut).trim().toLowerCase();
+  }
+
+  class EmailInvalid extends Error {
+    constructor(mesaj) { super(mesaj); this.name = 'EmailInvalid'; }
+  }
+
+  function adaugaEmail(lista, brut) {
+    const existente = Array.isArray(lista) ? lista.slice() : [];
+    const bucati = String(brut == null ? '' : brut)
+      .split(/[,;\s]+/)
+      .map(normalizeazaEmail)
+      .filter(Boolean);
+
+    if (!bucati.length) throw new EmailInvalid('Scrie o adresă de email.');
+
+    const gresite = bucati.filter((e) => !emailValid(e));
+    if (gresite.length) {
+      throw new EmailInvalid(
+        gresite.length === 1
+          ? `„${gresite[0]}” nu este o adresă validă.`
+          : `Adrese invalide: ${gresite.join(', ')}.`
+      );
+    }
+
+    const deja = [];
+    for (const e of bucati) {
+      if (existente.includes(e)) { deja.push(e); continue; }
+      existente.push(e);
+    }
+    if (!deja.length) return existente;
+    if (deja.length === bucati.length) {
+      throw new EmailInvalid(
+        bucati.length === 1 ? `${bucati[0]} este deja în listă.` : 'Toate adresele sunt deja în listă.'
+      );
+    }
+    return existente;
+  }
+
+  function stergeEmail(lista, adresa) {
+    const a = normalizeazaEmail(adresa);
+    return (Array.isArray(lista) ? lista : []).filter((e) => e !== a);
+  }
+
+  function destinatariPentru(generale, aleMasinii) {
+    const out = [];
+    for (const e of [].concat(generale || [], aleMasinii || [])) {
+      const n = normalizeazaEmail(e);
+      if (n && !out.includes(n)) out.push(n);
+    }
+    return out;
+  }
+
+  function escapeIcs(text) {
+    return String(text == null ? '' : text)
+      .replace(/\\/g, '\\\\')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,')
+      .replace(/\r?\n/g, '\\n');
+  }
+
+  function pliazaLinie(linie) {
+    const octeti = [];
+    for (const ch of String(linie)) {
+      octeti.push({ ch, n: new TextEncoder().encode(ch).length });
+    }
+    const linii = [];
+    let curenta = '', lungime = 0, limita = 75;
+    for (const { ch, n } of octeti) {
+      if (lungime + n > limita) {
+        linii.push(curenta);
+        curenta = ' ' + ch;
+        lungime = 1 + n;
+        limita = 75;
+      } else {
+        curenta += ch;
+        lungime += n;
+      }
+    }
+    if (curenta) linii.push(curenta);
+    return linii.join('\r\n');
+  }
+
+  function dataCompacta(iso) {
+    const p = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+    return p ? p[1] + p[2] + p[3] : null;
+  }
+
+  function acumCompact(acum) {
+    const d = acum instanceof Date ? acum : new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    return d.getUTCFullYear() + p(d.getUTCMonth() + 1) + p(d.getUTCDate())
+      + 'T' + p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds()) + 'Z';
+  }
+
+  const NUME_DOC = { itp: 'ITP', rca: 'RCA', rov: 'Rovinietă' };
+
+  function construiesteIcs(vehicule, optiuni) {
+    const o = optiuni || {};
+    const zile = Array.isArray(o.zileAlarma) && o.zileAlarma.length ? o.zileAlarma : [30, 7, 1];
+    const stamp = acumCompact(o.acum);
+
+    const linii = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Scadentar Auto//RO',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'X-WR-CALNAME:Scadențar Auto',
+    ];
+
+    let nrEvenimente = 0;
+
+    for (const v of (vehicule || [])) {
+      const rez = (v && v.rez) || {};
+      for (const cheie of ['itp', 'rca', 'rov']) {
+        const iso = rez[cheie] && rez[cheie].expiraLa;
+        const zi = dataCompacta(iso);
+        if (!zi) continue;
+
+        nrEvenimente++;
+        const titlu = `${NUME_DOC[cheie]} expiră · ${v.numar}`;
+        const bucati = [];
+        if (v.nume) bucati.push(v.nume);
+        if (v.vin) bucati.push('VIN ' + v.vin);
+        const cine = (o.destinatari && o.destinatari[v.numar]) || [];
+        if (cine.length) bucati.push('Alerte: ' + cine.join(', '));
+        const detaliu = rez[cheie] && rez[cheie].detaliu;
+        if (detaliu) bucati.push(detaliu);
+
+        linii.push('BEGIN:VEVENT');
+        linii.push('UID:' + [v.numar, cheie, zi].join('-').replace(/[^A-Za-z0-9-]/g, '') + '@scadentar');
+        linii.push('DTSTAMP:' + stamp);
+        linii.push('DTSTART;VALUE=DATE:' + zi);
+        linii.push('SUMMARY:' + escapeIcs(titlu));
+        if (bucati.length) linii.push('DESCRIPTION:' + escapeIcs(bucati.join('\n')));
+        linii.push('TRANSP:TRANSPARENT');
+
+        for (const z of zile) {
+          linii.push('BEGIN:VALARM');
+          linii.push('ACTION:DISPLAY');
+          linii.push('TRIGGER:-P' + Math.max(0, Math.round(z)) + 'D');
+          linii.push('DESCRIPTION:' + escapeIcs(titlu));
+          linii.push('END:VALARM');
+        }
+        linii.push('END:VEVENT');
+      }
+    }
+
+    linii.push('END:VCALENDAR');
+    return { text: linii.map(pliazaLinie).join('\r\n') + '\r\n', evenimente: nrEvenimente };
+  }
+
+  global.Alerte = {
+    emailValid, normalizeazaEmail, adaugaEmail, stergeEmail,
+    destinatariPentru, construiesteIcs, escapeIcs, pliazaLinie, EmailInvalid,
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>
+(function(){
+  'use strict';
+
+  var CHEIE='scadentar:v2', CHEIE_LIM='scadentar:limita',
+      CHEIE_MAIL='scadentar:emails', PRAG=30;
+
+  var JUDETE=('AB AG AR BC BH BN BR BT BV BZ CJ CL CS CT CV DB DJ GJ GL GR HD HR IF IL IS '
+    +'MH MM MS NT OT PH SB SJ SM SV TL TM TR VL VN VS B').split(' ');
+
+  var LINK={itp:'https://prog.rarom.ro/rarpol/rarpol.asp',
+            rca:'https://www.aida.info.ro/polite-rca',
+            rov:'https://www.erovinieta.ro/vignettes-portal-web/servlet/vignettes'};
+  var NUME={itp:'ITP', rca:'RCA', rov:'Rovinietă'};
+  var ORDINE=['itp','rca','rov'];
+
+  var mem={}, areStocare=(function(){
+    try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; }
+  })();
+  function get(k){ if(!areStocare) return mem[k]; try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function set(k,v){ if(!areStocare){ mem[k]=v; return; } try{ localStorage.setItem(k,v); }catch(e){} }
+
+  function citeste(){
+    var b=get(CHEIE); if(!b) return [];
+    if(Array.isArray(b)) return b;
+    try{ var d=JSON.parse(b); return Array.isArray(d)?d:[]; }catch(e){ return []; }
+  }
+  function scrie(v){ set(CHEIE, areStocare?JSON.stringify(v):v); }
+  function limita(){ var n=parseInt(get(CHEIE_LIM),10); return n>0?n:15; }
+
+  /* ---------- destinatarii alertelor ---------- */
+  var elPanou=document.getElementById('panou-alerte'),
+      elChips=document.getElementById('chips-generale'),
+      elInputMail=document.getElementById('input-mail'),
+      elNota=document.getElementById('nota-alerte');
+
+  var NOTA_IMPLICITA='Trimiterea automată pe email cere un furnizor de email configurat pe server. '
+    + 'Până atunci, butonul de calendar pune scadențele în telefonul tău, cu alarme la 30, 7 și o zi înainte.';
+
+  function emailuriGenerale(){
+    var b=get(CHEIE_MAIL); if(!b) return [];
+    if(Array.isArray(b)) return b;
+    try{ var d=JSON.parse(b); return Array.isArray(d)?d:[]; }catch(e){ return []; }
+  }
+  function scrieEmailuri(l){ set(CHEIE_MAIL, areStocare?JSON.stringify(l):l); }
+  function nota(text, rea){
+    elNota.textContent=text||NOTA_IMPLICITA;
+    elNota.style.color = rea ? 'var(--bad)' : 'var(--ink-3)';
+  }
+
+  function randeazaAlerte(){
+    var g=emailuriGenerale();
+    elChips.innerHTML = g.length
+      ? g.map(function(e){
+          return '<span class="mail">'+esc(e)
+            +'<button data-mail="'+esc(e)+'" aria-label="Șterge '+esc(e)+'">&times;</button></span>';
+        }).join('')
+      : '<span class="gol">Nicio adresă încă. Adaugă una mai jos.</span>';
+  }
+
+  function adaugaGenerale(){
+    try{
+      scrieEmailuri(Alerte.adaugaEmail(emailuriGenerale(), elInputMail.value));
+      elInputMail.value='';
+      nota(null); randeazaAlerte(); randeaza();
+    }catch(err){ nota(err.message, true); }
+  }
+
+  function descarcaIcs(){
+    var lista=citeste(), g=emailuriGenerale(), dest={};
+    lista.forEach(function(v){ dest[v.numar]=Alerte.destinatariPentru(g, v.emails); });
+    var r=Alerte.construiesteIcs(lista, {destinatari:dest});
+    if(!r.evenimente){ nota('Nicio scadență completată încă, nu am ce pune în calendar.', true); return; }
+    var blob=new Blob([r.text], {type:'text/calendar;charset=utf-8'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='scadentar-auto.ics';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    nota(r.evenimente+' scadențe puse în fișier. Deschide-l și se importă în calendarul tău.');
+  }
+
+  function randCine(v){
+    var proprii=v.emails||[];
+    var toti=Alerte.destinatariPentru(emailuriGenerale(), proprii);
+    var continut = toti.length
+      ? toti.map(function(e){
+          var propriu = proprii.indexOf(e)>=0;
+          return '<span class="mail">'+esc(e)
+            + (propriu ? '<button data-vmail="'+esc(e)+'" data-vid="'+esc(v.id)
+                       + '" aria-label="Scoate '+esc(e)+'">&times;</button>' : '')
+            + '</span>';
+        }).join('')
+      : '<span class="gol">nimeni încă</span>';
+    return '<div class="cine">Alerte către: '+continut
+      + '<button class="mini" data-addmail="'+esc(v.id)+'">+ adresă doar aici</button></div>';
+  }
+
+  function valNumar(s){
+    var n=String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    if(!n) throw new Error('Completează numărul de înmatriculare.');
+    if(/^B\d{2,3}[A-Z]{3}$/.test(n)) return n;
+    var m=/^([A-Z]{2})\d{2}[A-Z]{3}$/.exec(n);
+    if(m && JUDETE.indexOf(m[1])>=0) return n;
+    throw new Error('Număr invalid. Exemple corecte: B123ABC, B10ABC, CJ01ABC.');
+  }
+  function valVin(s){
+    var v=String(s||'').toUpperCase().replace(/[\s-]/g,'');
+    if(!v) return null;
+    if(v.length!==17) throw new Error('VIN-ul are exact 17 caractere. Ai introdus '+v.length+'.');
+    if(/[IOQ]/.test(v)) throw new Error('VIN-ul nu conține I, O sau Q. Verifică dacă sunt cifrele 1 sau 0.');
+    if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(v)) throw new Error('VIN-ul conține caractere nepermise.');
+    return v;
+  }
+
+  function azi(){ var d=new Date(); return Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()); }
+  function zile(iso){
+    var p=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!p) return null;
+    return Math.round((Date.UTC(+p[1],+p[2]-1,+p[3])-azi())/86400000);
+  }
+  function stare(z){ if(z===null) return 'none'; if(z<0) return 'bad'; if(z<=PRAG) return 'warn'; return 'ok'; }
+  function roData(iso){ var p=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); return p?p[3]+'.'+p[2]+'.'+p[1]:''; }
+  function textZile(z){
+    if(z===null) return 'necunoscut';
+    if(z<0) return 'expirat de '+(-z===1?'o zi':(-z)+' zile');
+    if(z===0) return 'expiră azi';
+    if(z===1) return 'mai are o zi';
+    if(z<60) return 'mai are '+z+' zile';
+    return 'mai are '+z+' zile, cam '+Math.round(z/30.4)+' luni';
+  }
+
+  var RANG={lipsa:4,bad:3,warn:2,none:1,ok:0};
+  var ET={ok:'Valabil',warn:'Expiră curând',bad:'Expirat',
+          lipsa:'Nu există',none:'Neverificat'};
+  var SCURT={ok:'Valabil',warn:'Curând',bad:'Expirat',lipsa:'Lipsă',none:'neverificat'};
+  var FARA={itp:'fără ITP în baza RAR', rca:'fără poliță în AIDA', rov:'fără rovinietă la CNAIR'};
+
+  function evalueaza(v){
+    var docs=ORDINE.map(function(k){
+      var d=(v.rez&&v.rez[k])||{};
+      var iso=d.expiraLa||null, z=zile(iso);
+      var st = (!iso && d.stare==='inexistent') ? 'lipsa' : stare(z);
+      return {k:k, nume:NUME[k], iso:iso, z:z, st:st, detaliu:d.detaliu||null};
+    });
+    var gen=docs.reduce(function(a,d){ return RANG[d.st]>RANG[a]?d.st:a; },'ok');
+    var zz=docs.map(function(d){return d.z;}).filter(function(x){return x!==null;});
+    return {v:v, docs:docs, gen:gen, urg:zz.length?Math.min.apply(null,zz):null};
+  }
+  function sorteaza(a){
+    return a.slice().sort(function(x,y){
+      if(RANG[x.gen]!==RANG[y.gen]) return RANG[y.gen]-RANG[x.gen];
+      if(x.urg===null&&y.urg===null) return x.v.numar.localeCompare(y.v.numar);
+      if(x.urg===null) return 1; if(y.urg===null) return -1;
+      if(x.urg!==y.urg) return x.urg-y.urg;
+      return x.v.numar.localeCompare(y.v.numar);
+    });
+  }
+
+  var elList=document.getElementById('list'), elStrip=document.getElementById('strip'),
+      elCount=document.getElementById('count'), elErr=document.getElementById('err'),
+      elForm=document.getElementById('form'), elBanner=document.getElementById('banner'),
+      elLimita=document.getElementById('limita'), elAll=document.getElementById('btn-all');
+  var filtru=null, ocupate={};
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function placuta(n){
+    var m=/^(B|[A-Z]{2})(\d{2,3})([A-Z]{3})$/.exec(n);
+    return '<span class="plate"><span class="eu"><i></i>RO</span><span class="nr">'
+      +esc(m?m[1]+' '+m[2]+' '+m[3]:n)+'</span></span>';
+  }
+
+  function eroare(m){ if(!m){elErr.hidden=true; return;} elErr.textContent=m; elErr.hidden=false; }
+
+  function verifica(id){
+    var v=citeste().filter(function(x){return x.id===id;})[0];
+    if(!v || ocupate[id]) return Promise.resolve();
+    ocupate[id]=true; randeaza();
+
+    return fetch('/api/verifica',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({numar:v.numar, vin:v.vin})
+    })
+    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+    .then(function(o){
+      scrie(citeste().map(function(x){
+        if(x.id!==id) return x;
+        if(!o.ok){ x.nota=o.j.eroare||'Verificare eșuată.'; return x; }
+        var j=o.j;
+        x.nota=(j.mod==='automat')?null:(j.mesaj||null);
+        x.rez=x.rez||{};
+        // "Nu are" este un raspuns, nu o lipsa de raspuns. Il salvam, altfel
+        // arata pe ecran identic cu "neverificat" si pare ca nu merge nimic.
+        (j.documente||[]).forEach(function(d){
+          if(d.expiraLa){
+            x.rez[d.cheie]={expiraLa:d.expiraLa, detaliu:d.detaliu,
+                            sursa:d.sursa||'automat', stare:d.stare};
+          } else if(d.stare==='inexistent'){
+            x.rez[d.cheie]={expiraLa:null, detaliu:d.detaliu,
+                            sursa:d.sursa||'automat', stare:'inexistent'};
+          }
+        });
+        if(j.tehnic&&j.tehnic.marca&&!x.nume) x.nume=(j.tehnic.marca+' '+(j.tehnic.model||'')).trim();
+        return x;
+      }));
+    })
+    .catch(function(e){
+      scrie(citeste().map(function(x){
+        if(x.id===id) x.nota='Nu s-a putut contacta serverul: '+e.message;
+        return x;
+      }));
+    })
+    .then(function(){ delete ocupate[id]; randeaza(); return aducePoza(id); });
+  }
+
+  /** Marca si fotografia. Surse gratuite: NHTSA pentru VIN, Wikipedia pentru poza. */
+  function aducePoza(id){
+    var v=citeste().filter(function(x){return x.id===id;})[0];
+    if(!v || v.pozaCautata) return Promise.resolve();
+    if(!v.vin && !v.nume) return Promise.resolve();
+
+    return fetch('/api/vehicul?vin='+encodeURIComponent(v.vin||'')
+                 +'&nume='+encodeURIComponent(v.nume||''))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        scrie(citeste().map(function(x){
+          if(x.id!==id) return x;
+          x.pozaCautata=true;
+          if(j && j.imagine && j.imagine.url) x.poza=j.imagine.url;
+          if(j && j.marca){
+            x.marca=(j.marca+' '+(j.model||'')).trim();
+            if(!x.nume) x.nume=x.marca;
+          }
+          return x;
+        }));
+        randeaza();
+      })
+      .catch(function(){
+        scrie(citeste().map(function(x){
+          if(x.id===id) x.pozaCautata=true;
+          return x;
+        }));
+      });
+  }
+
+  function verificaToate(){
+    elAll.disabled=true;
+    citeste().map(function(v){return v.id;})
+      .reduce(function(lant,id){ return lant.then(function(){ return verifica(id); }); }, Promise.resolve())
+      .then(function(){ elAll.disabled=false; randeaza(); });
+  }
+
+  function randeaza(){
+    var toate=citeste(), ev=sorteaza(toate.map(evalueaza));
+    var viz=filtru?ev.filter(function(e){return e.gen===filtru;}):ev;
+    var lim=limita();
+
+    var nr={lipsa:0,bad:0,warn:0,none:0,ok:0};
+    ev.forEach(function(e){ nr[e.gen]++; });
+    elStrip.innerHTML=[{k:'lipsa',t:'fără documente'},{k:'bad',t:'cu acte expirate'},{k:'warn',t:'expiră curând'},
+                       {k:'none',t:'neverificate'},{k:'ok',t:'în regulă'}]
+      .filter(function(o){return nr[o.k]>0;})
+      .map(function(o){ return '<button class="chip k-'+o.k+'" data-f="'+o.k+'" aria-pressed="'
+        +(filtru===o.k)+'"><b>'+nr[o.k]+'</b> '+o.t+'</button>'; }).join('');
+
+    elCount.textContent=toate.length+' din '+lim+' mașini';
+    document.getElementById('btn-add').disabled=toate.length>=lim;
+    elAll.disabled=!toate.length||Object.keys(ocupate).length>0;
+
+    elList.innerHTML = viz.length ? viz.map(card).join('')
+      : '<p class="empty-state">'+(toate.length?'Nicio mașină în această categorie.'
+        :'Nicio mașină încă. Apasă „Adaugă mașină”.')+'</p>';
+  }
+
+  function poza(v){
+    if(v.poza) return '<span class="poza"><img src="'+esc(v.poza)+'" alt="'
+      + esc(v.marca||v.numar)+'" loading="lazy"></span>';
+    return '<span class="poza"><span>'+esc((v.marca||'auto').slice(0,10))+'</span></span>';
+  }
+
+  function docMini(d){
+    var cls = d.st==='ok' ? 'p-ok' : d.st==='warn' ? 'p-warn'
+            : (d.st==='bad'||d.st==='lipsa') ? 'p-bad' : 'p-none';
+    return '<span class="dm '+cls+'" title="'+esc(d.nume+': '+ET[d.st])+'">'+d.nume
+      + '<b>'+(d.iso ? roData(d.iso) : (d.st==='lipsa' ? 'nu are' : '—'))+'</b>'
+      + '<i>'+SCURT[d.st]+'</i></span>';
+  }
+
+  function card(e){
+    var v=e.v, busy=!!ocupate[v.id];
+    return ''
+    +'<article class="veh s-'+e.gen+(busy?' busy':'')+'">'
+    + '<div class="sev"></div><div class="body">'
+    + '<div class="head">'
+    +   poza(v)
+    +   placuta(v.numar)
+    +   '<div class="who"><div class="nick">'+esc(v.nume||v.marca||'Fără nume')+'</div>'
+    +     '<div class="vin">'+(v.vin?esc(v.vin):'<em>fără VIN</em>')+'</div></div>'
+    +   '<div class="dmini">'+e.docs.map(docMini).join('')+'</div>'
+    +   '<div class="acts">'
+    +     '<button class="mini" data-check="'+esc(v.id)+'"'+(busy?' disabled':'')+'>'
+    +       (busy?'…':'Verifică')+'</button>'
+    +     '<button class="mini del" data-del="'+esc(v.id)+'" aria-label="Șterge '+esc(v.numar)+'">&times;</button>'
+    +   '</div>'
+    + '</div>'
+    + (v.nota?'<div class="note">'+esc(v.nota)+'</div>':'')
+    + '<details class="mai"><summary>Detalii, date și alerte</summary>'
+    +   '<div class="docs">'+e.docs.map(function(d){return doc(v,d);}).join('')+'</div>'
+    +   randCine(v)
+    + '</details>'
+    + '</div></article>';
+  }
+
+  function doc(v,d){
+    var cls = d.st==='ok' ? 'p-ok' : d.st==='warn' ? 'p-warn'
+             : (d.st==='bad'||d.st==='lipsa') ? 'p-bad' : 'p-none';
+    var lc = (d.st==='bad'||d.st==='lipsa') ? ' bad' : d.st==='warn' ? ' warn' : '';
+    return ''
+    +'<div class="doc">'
+    + '<div class="dtop"><span class="dname">'+d.nume+'</span>'
+    +   '<span class="pill '+cls+'">'+ET[d.st]+'</span></div>'
+    + '<div class="until'+(d.iso?'':' empty')+'">'+(d.iso?roData(d.iso):'—')+'</div>'
+    + '<div class="left'+lc+'">'+(d.st==='lipsa'?FARA[d.k]:textZile(d.z))+'</div>'
+    + (d.detaliu?'<div class="detaliu">'+esc(d.detaliu)+'</div>':'')
+    + '<div class="edit">'
+    +   '<input type="date" value="'+esc(d.iso||'')+'" data-id="'+esc(v.id)+'" data-doc="'+d.k+'"'
+    +     ' aria-label="Data expirare '+d.nume+' pentru '+esc(v.numar)+'">'
+    +   '<a class="src" href="'+LINK[d.k]+'" target="_blank" rel="noopener noreferrer">oficial</a>'
+    + '</div></div>';
+  }
+
+  document.getElementById('btn-add').addEventListener('click',function(){
+    elForm.hidden=!elForm.hidden; eroare(null);
+    if(!elForm.hidden) elForm.querySelector('[name=numar]').focus();
+  });
+  document.getElementById('btn-cancel').addEventListener('click',function(){ elForm.hidden=true; eroare(null); });
+  elAll.addEventListener('click',verificaToate);
+
+  document.getElementById('btn-alerte').addEventListener('click',function(){
+    elPanou.hidden=!elPanou.hidden;
+    if(!elPanou.hidden){ nota(null); elInputMail.focus(); }
+  });
+  document.getElementById('btn-mail').addEventListener('click',adaugaGenerale);
+  document.getElementById('btn-ics').addEventListener('click',descarcaIcs);
+  elInputMail.addEventListener('keydown',function(ev){
+    if(ev.key==='Enter'){ ev.preventDefault(); adaugaGenerale(); }
+  });
+  elChips.addEventListener('click',function(ev){
+    var b=ev.target.closest('[data-mail]');
+    if(!b) return;
+    scrieEmailuri(Alerte.stergeEmail(emailuriGenerale(), b.getAttribute('data-mail')));
+    nota(null); randeazaAlerte(); randeaza();
+  });
+
+  elForm.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var f=ev.target, lista=citeste();
+    try{
+      if(lista.length>=limita()) throw new Error('Ai atins limita de '+limita()+' mașini.');
+      var numar=valNumar(f.numar.value), vin=valVin(f.vin.value);
+      if(lista.some(function(x){return x.numar===numar;})) throw new Error(numar+' este deja în listă.');
+      var id='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+      lista.push({id:id, nume:f.nume.value.trim()||null, numar:numar, vin:vin, rez:{}, nota:null});
+      scrie(lista); f.reset(); elForm.hidden=true; eroare(null); filtru=null; randeaza();
+      verifica(id);
+    }catch(err){ eroare(err.message); }
+  });
+
+  elList.addEventListener('click',function(ev){
+    var c=ev.target.closest('[data-check]');
+    if(c){ verifica(c.getAttribute('data-check')); return; }
+
+    var am=ev.target.closest('[data-addmail]');
+    if(am){
+      var idm=am.getAttribute('data-addmail');
+      var raspuns=prompt('Adrese care primesc alerte doar pentru această mașină. Poți pune mai multe, separate prin virgulă.');
+      if(raspuns===null) return;
+      try{
+        var lista=citeste();
+        var tinta=lista.filter(function(x){return x.id===idm;})[0];
+        if(!tinta) return;
+        tinta.emails=Alerte.adaugaEmail(tinta.emails||[], raspuns);
+        scrie(lista); randeaza();
+      }catch(err){ alert(err.message); }
+      return;
+    }
+    var rm=ev.target.closest('[data-vmail]');
+    if(rm){
+      var vid=rm.getAttribute('data-vid'), adr=rm.getAttribute('data-vmail');
+      scrie(citeste().map(function(x){
+        if(x.id===vid) x.emails=Alerte.stergeEmail(x.emails||[], adr);
+        return x;
+      }));
+      randeaza(); return;
+    }
+    var b=ev.target.closest('[data-del]');
+    if(!b) return;
+    var id=b.getAttribute('data-del');
+    var v=citeste().filter(function(x){return x.id===id;})[0];
+    if(v&&confirm('Ștergi '+v.numar+' din listă?')){
+      scrie(citeste().filter(function(x){return x.id!==id;})); randeaza();
+    }
+  });
+
+  elList.addEventListener('change',function(ev){
+    var t=ev.target;
+    if(t.tagName!=='INPUT'||!t.dataset.doc) return;
+    scrie(citeste().map(function(v){
+      if(v.id===t.dataset.id){
+        v.rez=v.rez||{};
+        if(t.value) v.rez[t.dataset.doc]={expiraLa:t.value, detaliu:'introdus manual', sursa:'manual', stare:'valabil'};
+        else delete v.rez[t.dataset.doc];
+      }
+      return v;
+    }));
+    randeaza();
+  });
+
+  elStrip.addEventListener('click',function(ev){
+    var b=ev.target.closest('[data-f]'); if(!b) return;
+    filtru=(filtru===b.dataset.f)?null:b.dataset.f; randeaza();
+  });
+
+  elLimita.addEventListener('change',function(){
+    var n=Math.min(200,parseInt(elLimita.value,10)||15);
+    elLimita.value=n; set(CHEIE_LIM,String(n)); randeaza();
+  });
+
+  var d=new Date();
+  document.getElementById('azi').textContent='azi '+String(d.getDate()).padStart(2,'0')+'.'
+    +String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
+  elLimita.value=limita();
+  randeaza();
+  randeazaAlerte();
+  nota(null);
+
+  fetch('/api/verifica').then(function(r){return r.json();}).then(function(j){
+    var rca = j.rcaDisponibil
+      ? 'RCA vine de la <b>'+esc(j.rcaProvider)+'</b>.'
+      : 'RCA nu are furnizor. Adaugă <code>RCA_PROVIDER</code> în Vercel.';
+    elBanner.innerHTML = '<div class="banner ok"><b>Rovinieta se verifică gratuit la CNAIR.</b> '
+      + rca + ' ITP nu are sursă gratuită, RAR cere cod din imagine, deci se completează '
+      + 'de mână din „Detalii” pe fiecare card.</div>';
+  }).catch(function(){
+    elBanner.innerHTML='<div class="banner">Nu s-a putut afla starea verificării automate.</div>';
+  });
+})();
+</script>
+</body>
+</html>
