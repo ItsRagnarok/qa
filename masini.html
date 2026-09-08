@@ -624,17 +624,20 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
     return 'mai are '+z+' zile, cam '+Math.round(z/30.4)+' luni';
   }
 
-  var RANG={lipsa:4,bad:3,warn:2,none:1,ok:0};
+  var RANG={lipsa:4,bad:3,manual:2,warn:2,none:1,ok:0};
   var ET={ok:'Valabil',warn:'Expiră curând',bad:'Expirat',
-          lipsa:'Nu există',none:'Neverificat'};
-  var SCURT={ok:'Valabil',warn:'Curând',bad:'Expirat',lipsa:'Lipsă',none:'neverificat'};
+          lipsa:'Nu există',none:'Neverificat',manual:'Introdu data manual'};
+  var SCURT={ok:'Valabil',warn:'Curând',bad:'Expirat',lipsa:'Lipsă',none:'neverificat',manual:'Manual'};
   var FARA={itp:'fără ITP în baza RAR', rca:'fără poliță în AIDA', rov:'fără rovinietă la CNAIR'};
+  var MANUAL={itp:'RAR nu oferă verificare gratuită (cere cod din imagine) — deschide linkul „oficial” și scrie data mai jos.'};
 
   function evalueaza(v){
     var docs=ORDINE.map(function(k){
       var d=(v.rez&&v.rez[k])||{};
       var iso=d.expiraLa||null, z=zile(iso);
-      var st = (!iso && d.stare==='inexistent') ? 'lipsa' : stare(z);
+      var st = (!iso && d.stare==='inexistent') ? 'lipsa'
+             : (!iso && d.stare==='manual') ? 'manual'
+             : stare(z);
       return {k:k, nume:NUME[k], iso:iso, z:z, st:st, detaliu:d.detaliu||null};
     });
     var gen=docs.reduce(function(a,d){ return RANG[d.st]>RANG[a]?d.st:a; },'ok');
@@ -694,6 +697,11 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
           } else if(d.stare==='inexistent'){
             x.rez[d.cheie]={expiraLa:null, detaliu:d.detaliu,
                             sursa:d.sursa||'automat', stare:'inexistent'};
+          } else {
+            // Fara sursa gratuita (ex. ITP la RAR): nu lasam intrarea goala, ca sa
+            // nu arate identic cu "n-am verificat inca" — salvam explicit ca "de completat manual".
+            x.rez[d.cheie]={expiraLa:null, detaliu:d.detaliu||MANUAL[d.cheie]||null,
+                            sursa:d.sursa||'automat', stare:'manual'};
           }
         });
         if(j.tehnic&&j.tehnic.marca&&!x.nume) x.nume=(j.tehnic.marca+' '+(j.tehnic.model||'')).trim();
@@ -775,10 +783,10 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
   }
 
   function docMini(d){
-    var cls = d.st==='ok' ? 'p-ok' : d.st==='warn' ? 'p-warn'
+    var cls = d.st==='ok' ? 'p-ok' : (d.st==='warn'||d.st==='manual') ? 'p-warn'
             : (d.st==='bad'||d.st==='lipsa') ? 'p-bad' : 'p-none';
     return '<span class="dm '+cls+'" title="'+esc(d.nume+': '+ET[d.st])+'">'+d.nume
-      + '<b>'+(d.iso ? roData(d.iso) : (d.st==='lipsa' ? 'nu are' : '—'))+'</b>'
+      + '<b>'+(d.iso ? roData(d.iso) : (d.st==='lipsa' ? 'nu are' : d.st==='manual' ? 'manual' : '—'))+'</b>'
       + '<i>'+SCURT[d.st]+'</i></span>';
   }
 
@@ -808,16 +816,16 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
   }
 
   function doc(v,d){
-    var cls = d.st==='ok' ? 'p-ok' : d.st==='warn' ? 'p-warn'
+    var cls = d.st==='ok' ? 'p-ok' : (d.st==='warn'||d.st==='manual') ? 'p-warn'
              : (d.st==='bad'||d.st==='lipsa') ? 'p-bad' : 'p-none';
-    var lc = (d.st==='bad'||d.st==='lipsa') ? ' bad' : d.st==='warn' ? ' warn' : '';
+    var lc = (d.st==='bad'||d.st==='lipsa') ? ' bad' : (d.st==='warn'||d.st==='manual') ? ' warn' : '';
     return ''
     +'<div class="doc">'
     + '<div class="dtop"><span class="dname">'+d.nume+'</span>'
     +   '<span class="pill '+cls+'">'+ET[d.st]+'</span></div>'
     + '<div class="until'+(d.iso?'':' empty')+'">'+(d.iso?roData(d.iso):'—')+'</div>'
-    + '<div class="left'+lc+'">'+(d.st==='lipsa'?FARA[d.k]:textZile(d.z))+'</div>'
-    + (d.detaliu?'<div class="detaliu">'+esc(d.detaliu)+'</div>':'')
+    + '<div class="left'+lc+'">'+(d.st==='lipsa'?FARA[d.k]:d.st==='manual'?(d.detaliu||'de completat manual'):textZile(d.z))+'</div>'
+    + (d.detaliu&&d.st!=='manual'?'<div class="detaliu">'+esc(d.detaliu)+'</div>':'')
     + '<div class="edit">'
     +   '<input type="date" value="'+esc(d.iso||'')+'" data-id="'+esc(v.id)+'" data-doc="'+d.k+'"'
     +     ' aria-label="Data expirare '+d.nume+' pentru '+esc(v.numar)+'">'
