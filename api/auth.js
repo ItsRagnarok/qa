@@ -114,7 +114,10 @@ export default async function handler(req, res) {
   }
 
   if (action === "logout") {
-    res.setHeader("set-cookie", `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
+    res.setHeader("set-cookie", [
+      `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`,
+      `qavb_ok=; Path=/; Max-Age=0; Secure; SameSite=Lax`,
+    ]);
     return json(res, 200, { ok: true });
   }
 
@@ -139,9 +142,9 @@ export default async function handler(req, res) {
   if (!ok) return json(res, 401, { message: "Email sau parolă greșite." });
 
   const expires = Date.now() + MAX_AGE * 1000;
-  res.setHeader(
-    "set-cookie",
+  res.setHeader("set-cookie", [
     `${COOKIE}=${encodeURIComponent(sign(user.email, expires))}; Path=/; Max-Age=${MAX_AGE}; HttpOnly; Secure; SameSite=Lax`,
-  );
+    `qavb_ok=1; Path=/; Max-Age=${MAX_AGE}; Secure; SameSite=Lax`,
+  ]);
   return json(res, 200, { ok: true, email: user.email });
 }
