@@ -69,11 +69,17 @@ button,input,textarea,select{font:inherit;color:inherit}
 .top-right{display:flex;align-items:center;gap:9px}
 .who{font-size:12.5px;color:var(--ink-soft)}
 
-.projbar{display:flex;gap:8px;overflow-x:auto;padding:14px 0 4px;scrollbar-width:none}
-.projbar::-webkit-scrollbar{display:none}
-.chip{flex:none;min-height:44px;padding:0 15px;border-radius:22px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink-soft);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
-.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.chip .n{font-family:var(--font-mono);font-size:11.5px;opacity:.75;font-variant-numeric:tabular-nums}
+.picker-search{margin:16px 0 0}
+.picker-search input{width:100%;min-height:46px;padding:0 14px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface-2);font-size:15px}
+.picker-list{margin:12px 0 0;display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto}
+.picker-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font:inherit;color:inherit}
+.picker-item:hover{border-color:var(--accent-soft);background:var(--surface-2)}
+.picker-item .pi-name{flex:1;min-width:0;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.picker-item .pi-n{flex:none;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.picker-item .pi-go{flex:none;color:var(--ink-faint)}
+.picker-empty{color:var(--ink-faint);font-size:14px;padding:16px 2px}
+.back-inline{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--ink-soft);font-size:13.5px;font-weight:600;cursor:pointer;padding:14px 0 0;font:inherit}
+.back-inline:hover{color:var(--accent)}
 
 .gauge{margin:18px 0 0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
 .gauge-figs{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -185,9 +191,22 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);font-
     </div>
   </header>
 
-  <nav class="projbar" id="projbar" aria-label="Proiecte"></nav>
+  <div id="pickerView">
+    <div class="picker-search"><input id="pSearch" type="search" placeholder="Caută un proiect…" aria-label="Caută un proiect"></div>
+    <div class="picker-list" id="pickerList"></div>
+    <section class="panel">
+      <h2>Proiect nou</h2>
+      <p class="lead">Pentru orice altceva în afara planului de 90 de zile.</p>
+      <div class="row">
+        <input id="pNew" type="text" placeholder="Numele proiectului" aria-label="Numele proiectului" maxlength="60">
+        <button class="btn" id="pAdd" type="button">Creează</button>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+  </div>
 
-  <div id="planView">
+  <div id="planView" hidden>
+    <button class="back-inline" id="planBack" type="button">← Toate proiectele</button>
     <section class="gauge">
       <div class="gauge-figs">
         <div class="gauge-now"><b id="gNow">23</b><span>din 500 de utilizatori</span></div>
@@ -219,6 +238,7 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);font-
   </div>
 
   <div id="customView" hidden>
+    <button class="back-inline" id="customBack" type="button">← Toate proiectele</button>
     <section class="panel">
       <h2 id="cName">Proiect</h2>
       <p class="lead">Sarcinile tale pentru acest proiect.</p>
@@ -240,16 +260,6 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);font-
     </section>
   </div>
 
-  <section class="panel">
-    <h2>Proiect nou</h2>
-    <p class="lead">Pentru orice altceva în afara planului de 90 de zile.</p>
-    <div class="row">
-      <input id="pNew" type="text" placeholder="Numele proiectului" aria-label="Numele proiectului" maxlength="60">
-      <button class="btn" id="pAdd" type="button">Creează</button>
-    </div>
-    <div class="status" id="status"></div>
-  </section>
-
   <footer>
     <div class="legend">
       <span class="blaze cod"><i></i>cod</span>
@@ -270,7 +280,8 @@ var TARGET = 500, START_USERS = 23;
 var PLAN_ID = "__plan90";
 
 var state = { projects: [], done: {}, log: [], start_date: null };
-var active = PLAN_ID;
+var active = null;
+var pickerQuery = "";
 var saveTimer = null;
 
 function $(id) { return document.getElementById(id); }
@@ -441,7 +452,7 @@ function paintCounts() {
     var b = document.querySelector('[data-stage="' + st.n + '"]');
     if (b) b.style.inlineSize = (total ? (done / total) * 100 : 0) + "%";
   });
-  renderProjbar();
+  if (active === null) renderPicker();
 }
 
 function renderRidge() {
@@ -494,9 +505,7 @@ function projectDone(p) {
   return done;
 }
 
-function renderProjbar() {
-  var bar = $("projbar");
-  bar.textContent = "";
+function renderPicker() {
   var planDone = 0, planTotal = 0;
   for (var d = 1; d <= 90; d++) {
     var t = PLAN[d] || [];
@@ -508,22 +517,34 @@ function renderProjbar() {
       return { id: p.id, name: p.name, done: projectDone(p), total: p.tasks.length };
     }));
 
+  var q = pickerQuery.trim().toLowerCase();
+  if (q) items = items.filter(function (it) { return it.name.toLowerCase().indexOf(q) !== -1; });
+
+  var list = $("pickerList");
+  list.textContent = "";
+  if (!items.length) {
+    var e = document.createElement("p");
+    e.className = "picker-empty";
+    e.textContent = "Niciun proiect găsit.";
+    list.appendChild(e);
+    return;
+  }
   items.forEach(function (it) {
     var b = document.createElement("button");
     b.type = "button";
-    b.className = "chip" + (it.id === active ? " on" : "");
-    b.innerHTML = '<span></span><span class="n"></span>';
-    b.querySelector("span").textContent = it.name;
-    b.querySelector(".n").textContent = it.done + "/" + it.total;
+    b.className = "picker-item";
+    b.innerHTML = '<span class="pi-name"></span><span class="pi-n"></span><span class="pi-go">→</span>';
+    b.querySelector(".pi-name").textContent = it.name;
+    b.querySelector(".pi-n").textContent = it.done + "/" + it.total;
     b.addEventListener("click", function () { active = it.id; renderActive(); });
-    bar.appendChild(b);
+    list.appendChild(b);
   });
 }
 
 function renderCustom() {
   var p = null;
   state.projects.forEach(function (x) { if (x.id === active) p = x; });
-  if (!p) { active = PLAN_ID; renderActive(); return; }
+  if (!p) { active = null; renderActive(); return; }
   $("cName").textContent = p.name;
   var host = $("cTasks");
   host.textContent = "";
@@ -545,10 +566,13 @@ function renderCustom() {
 
 function renderActive() {
   var isPlan = active === PLAN_ID;
+  var isCustom = active !== null && !isPlan;
+  $("pickerView").hidden = active !== null;
   $("planView").hidden = !isPlan;
-  $("customView").hidden = isPlan;
-  if (isPlan) { renderToday(); renderLog(); } else { renderCustom(); }
-  renderProjbar();
+  $("customView").hidden = !isCustom;
+  if (isPlan) { renderToday(); renderLog(); }
+  else if (isCustom) { renderCustom(); }
+  else { renderPicker(); }
 }
 
 $("logBtn").addEventListener("click", function () {
@@ -591,10 +615,14 @@ $("cDelete").addEventListener("click", function () {
   if (!p) return;
   p.tasks.forEach(function (t) { delete state.done[t.id]; });
   state.projects = state.projects.filter(function (x) { return x.id !== p.id; });
-  active = PLAN_ID;
+  active = null;
   save();
   renderActive();
 });
+
+$("planBack").addEventListener("click", function () { active = null; renderActive(); });
+$("customBack").addEventListener("click", function () { active = null; renderActive(); });
+$("pSearch").addEventListener("input", function () { pickerQuery = $("pSearch").value; renderPicker(); });
 
 $("logout").addEventListener("click", async function () {
   await api("/api/auth?action=logout", { method: "POST" });
