@@ -2,7 +2,7 @@ import { ImapFlow } from "imapflow";
 import nodemailer from "nodemailer";
 import { simpleParser } from "mailparser";
 import { sessionEmail } from "./auth.js";
-import { encryptSecret, decryptSecret } from "./_crypto.js";
+import { encryptSecret, decryptSecret } from "../lib/crypto.js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://ldfpnnfagcvjhdmfzxhi.supabase.co";
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;

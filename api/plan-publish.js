@@ -1,5 +1,5 @@
 import { sessionEmail } from "./auth.js";
-import { shortId } from "./_ids.js";
+import { shortId } from "../lib/ids.js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://ldfpnnfagcvjhdmfzxhi.supabase.co";
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;

@@ -3,6 +3,11 @@
   "functions": {
     "api/mail.js": { "maxDuration": 30 }
   },
+  "rewrites": [
+    { "source": "/api/plan-get", "destination": "/api/plan?op=get" },
+    { "source": "/api/plan-toggle", "destination": "/api/plan?op=toggle" },
+    { "source": "/api/plan-approve", "destination": "/api/plan?op=approve" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
