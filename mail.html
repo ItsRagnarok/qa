@@ -98,13 +98,16 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .reader-body.html table{max-width:100%}
 .empty{color:var(--ink-faint);opacity:1}
 .list-foot{color:var(--ink-soft);opacity:1}
+.back-fab{position:fixed;top:14px;left:14px;z-index:20;display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border-strong);border-radius:999px;padding:9px 15px;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;box-shadow:var(--shadow)}
+.back-fab:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:720px){.back-fab{top:10px;left:10px;padding:9px 13px;font-size:12.5px}}
 </style>
 </head>
 <body>
+<a href="/" class="back-fab" aria-label="Înapoi la aplicații">← Aplicații</a>
 <div class="wrap">
   <div class="top">
     <div class="top-left">
-      <a class="btn" href="/">← Aplicații</a>
       <h1>Email</h1>
       <select id="addr-select" class="addr-select" aria-label="Alege adresa" hidden></select>
     </div>
