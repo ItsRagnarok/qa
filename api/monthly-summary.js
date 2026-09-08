@@ -1,7 +1,7 @@
 import { sessionEmail } from "./auth.js";
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
-const MODEL = "gemini-2.0-flash";
+const MODEL = "gemini-3.6-flash";
 
 function json(res, status, body) {
   res.status(status).setHeader("content-type", "application/json; charset=utf-8");
