@@ -3,28 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Your Voice</title>
+<title>Platforma ta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-:root{--bg:#F5F4EF;--surface:#FFFFFF;--surface-2:#FBFAF6;--border:#DEDBD1;--border-strong:#C7C3B6;--ink:#1E2420;--ink-soft:#5B655F;--ink-faint:#8B948C;--accent:#2F6B58;--accent-ink:#FFFFFF;--accent-soft:#E1EEE7;--danger:#A8402A;--danger-soft:#F6DFD8;--shadow:0 1px 2px rgba(30,36,32,.06),0 6px 18px rgba(30,36,32,.07);--font-display:'Archivo','Arial Narrow',sans-serif;--font-body:'IBM Plex Sans',system-ui,-apple-system,sans-serif}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101513;--surface:#171E1B;--surface-2:#1D2521;--border:#2B3531;--border-strong:#3A4642;--ink:#E7ECE8;--ink-soft:#A3ADA6;--ink-faint:#6E7873;--accent:#6FC8A8;--accent-ink:#0B1512;--accent-soft:#1D362E;--danger:#E38468;--danger-soft:#3A211A;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35)}}
-:root[data-theme="dark"]{--bg:#101513;--surface:#171E1B;--surface-2:#1D2521;--border:#2B3531;--border-strong:#3A4642;--ink:#E7ECE8;--ink-soft:#A3ADA6;--ink-faint:#6E7873;--accent:#6FC8A8;--accent-ink:#0B1512;--accent-soft:#1D362E;--danger:#E38468;--danger-soft:#3A211A;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35)}
+:root{--bg:#F5F4EF;--surface:#FFFFFF;--surface-2:#FBFAF6;--border:#DEDBD1;--border-strong:#C7C3B6;--ink:#1E2420;--ink-soft:#5B655F;--ink-faint:#8B948C;--accent:#2F6B58;--accent-rgb:47,107,88;--accent-ink:#FFFFFF;--accent-soft:#E1EEE7;--warn:#A9701F;--warn-soft:#F5E7D2;--danger:#A8402A;--danger-rgb:168,64,42;--danger-soft:#F6DFD8;--focus:#2F6B58;--shadow:0 1px 2px rgba(30,36,32,.06),0 6px 18px rgba(30,36,32,.07);--radius:12px;--radius-sm:8px;--font-display:'Archivo','Arial Narrow',sans-serif;--font-body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',monospace}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101513;--surface:#171E1B;--surface-2:#1D2521;--border:#2B3531;--border-strong:#3A4642;--ink:#E7ECE8;--ink-soft:#A3ADA6;--ink-faint:#6E7873;--accent:#6FC8A8;--accent-rgb:111,200,168;--accent-ink:#0B1512;--accent-soft:#1D362E;--warn:#E0AA5C;--warn-soft:#3A2C16;--danger:#E38468;--danger-rgb:227,132,104;--danger-soft:#3A211A;--focus:#6FC8A8;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35)}}:root[data-theme="dark"]{--bg:#101513;--surface:#171E1B;--surface-2:#1D2521;--border:#2B3531;--border-strong:#3A4642;--ink:#E7ECE8;--ink-soft:#A3ADA6;--ink-faint:#6E7873;--accent:#6FC8A8;--accent-rgb:111,200,168;--accent-ink:#0B1512;--accent-soft:#1D362E;--warn:#E0AA5C;--warn-soft:#3A2C16;--danger:#E38468;--danger-rgb:227,132,104;--danger-soft:#3A211A;--focus:#6FC8A8;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35)}
 *,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}
 body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--font-body);-webkit-text-size-adjust:100%}
 h1,h2,strong{font-family:var(--font-display)}
-.btn-primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;min-height:44px}
-.btn-ghost{background:transparent;border:1px solid var(--border);color:inherit;border-radius:8px;padding:9px 13px;font-size:13px;cursor:pointer;font-family:inherit;min-height:40px}
-.auth-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);padding:20px;overflow:auto}
-.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:390px;box-shadow:var(--shadow)}
-.auth-card h2{margin:0 0 4px;font-size:19px}
-.auth-sub{margin:0 0 18px;font-size:13px;opacity:.72;line-height:1.45}
-.auth-card label{display:block;font-size:12px;opacity:.8;margin:12px 0 5px}
-.auth-card input{width:100%;box-sizing:border-box;padding:11px 12px;min-height:44px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:inherit;font-size:16px}
-.auth-card button[type=submit]{width:100%;margin-top:18px;padding:11px;font-size:14px}
-.auth-msg{margin:12px 0 0;font-size:12.5px;opacity:.85;line-height:1.4;min-height:18px}
-.auth-msg.bad{color:var(--danger);opacity:1}
+.btn-primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:inherit;border-radius:8px;padding:9px 13px;font-size:13px;cursor:pointer;font-family:inherit}
+.auth-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);padding:20px}.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:390px;box-shadow:var(--shadow)}.auth-card h2{margin:0 0 4px;font-size:19px}.auth-card .auth-sub{margin:0 0 18px;font-size:13px;opacity:.72;line-height:1.45}.auth-card label{display:block;font-size:12px;opacity:.8;margin:12px 0 5px}.auth-card input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:inherit;font-size:14px}.auth-card button[type=submit]{width:100%;margin-top:18px;padding:11px;font-size:14px}.auth-msg{margin:12px 0 0;font-size:12.5px;opacity:.85;line-height:1.4}.auth-msg.bad{color:var(--danger);opacity:1}.auth-skip{display:block;width:100%;margin-top:10px;background:none;border:none;color:inherit;opacity:.6;font-size:12.5px;cursor:pointer;text-decoration:underline}body.auth-locked{overflow:hidden}.auth-overlay{overflow:auto;padding:24px}.auth-layout{display:flex;flex-direction:column-reverse;gap:30px;align-items:center;justify-content:center;width:100%;max-width:1060px;margin:auto}.auth-intro{display:block;width:100%;max-width:540px;color:var(--ink)}.auth-eyebrow{margin:0 0 14px;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;opacity:.55}.auth-title{margin:0 0 14px;font-size:31px;line-height:1.18;letter-spacing:-.015em;font-weight:700}.auth-lead{margin:0 0 26px;font-size:14.5px;line-height:1.6;opacity:.72;max-width:460px}.auth-features{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:12px}.auth-features li{display:flex;gap:12px;align-items:flex-start;padding:13px 14px;border:1px solid var(--border);border-radius:11px;background:var(--surface-2)}@media(min-width:920px){.auth-layout{flex-direction:row;gap:48px}.auth-intro{flex:1}.auth-features{grid-template-columns:1fr 1fr;gap:12px}}.auth-feature-icon{font-size:16px;line-height:1.35;flex:none}.auth-features strong{display:block;font-size:13.5px;margin-bottom:3px}.auth-features p{margin:0;font-size:12.5px;line-height:1.5;opacity:.62}.auth-note{margin:26px 0 0;font-size:12px;opacity:.45;line-height:1.5}.auth-card{flex:none}body.auth-locked > *:not(.auth-overlay){display:none!important}.auth-overlay{background:var(--bg)}.auth-brand{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.5;margin:0 0 14px}.auth-who{font-size:12px;opacity:.7;margin:0 6px}
 .hub{max-width:1000px;margin:0 auto;padding:26px 18px 70px}
 .hub-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:28px}
 .hub-brand{display:flex;flex-direction:column;gap:3px}
@@ -36,66 +26,76 @@ h1,h2,strong{font-family:var(--font-display)}
 .app-grid{display:grid;grid-template-columns:1fr;gap:14px}
 @media(min-width:760px){.app-grid{grid-template-columns:1fr 1fr}}
 .app-tile{display:flex;gap:14px;align-items:flex-start;padding:20px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);text-decoration:none;color:inherit;transition:border-color .15s,background .15s}
-.app-tile:hover{border-color:var(--accent)}
-.app-tile.disabled{opacity:.55;cursor:default}
+.app-tile:hover{border-color:var(--accent);background:var(--surface-2)}
+.app-tile.soon{opacity:.55;pointer-events:none}
 .app-icon{font-size:26px;line-height:1;flex:none}
 .app-body{display:flex;flex-direction:column;gap:6px;min-width:0}
-.app-body strong{font-size:16px;display:flex;align-items:center;gap:8px}
+.app-body strong{font-size:16px}
 .app-desc{font-size:13px;line-height:1.55;opacity:.66}
 .app-go{font-size:12.5px;color:var(--accent);font-weight:600;margin-top:4px}
-.app-badge{font-family:var(--font-body);font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;background:var(--danger-soft);color:var(--danger);border-radius:5px;padding:2px 7px}
+.app-soon{font-size:11px;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin-top:4px}
 .hub-foot{margin-top:34px;font-size:12px;opacity:.4;line-height:1.6}
-@media(max-width:720px){html{touch-action:manipulation}input,textarea,select{font-size:16px!important}.btn-ghost,.btn-primary{min-height:44px}}
+@media(max-width:720px){html{touch-action:manipulation}input,textarea,select{font-size:16px!important}.btn-ghost,.btn-primary{min-height:42px}}
+@supports(padding:env(safe-area-inset-bottom)){
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+.wrap,.hub{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+}
+.btn{color:var(--ink);border-color:var(--border-strong)}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.45}
+.btn-danger{color:var(--danger);border-color:var(--danger)}
+.btn-danger:hover{color:var(--danger);border-color:var(--danger);background:var(--danger-soft)}
+.top h1,.hub-brand h1{color:var(--ink)}
+.addr,.hub-mail{color:var(--ink-soft);opacity:1}
+.folders button{color:var(--ink)}
+.item-from{color:var(--ink-soft);opacity:1}
+.item-date{color:var(--ink-faint);opacity:1}
+.item-subj{color:var(--ink)}
+.reader-meta{color:var(--ink-soft);opacity:1}
+.reader-body.html{background:#ffffff;color:#1b1f1d;padding:16px;border-radius:10px;border:1px solid var(--border);overflow-x:auto}
+.reader-body.html a{color:#1a5fb4}
+.reader-body.html table{max-width:100%}
+.empty{color:var(--ink-faint);opacity:1}
+.list-foot{color:var(--ink-soft);opacity:1}
 </style>
 </head>
 <body>
 <div id="hub" class="hub" hidden>
   <div class="hub-top">
-    <div class="hub-brand"><span class="eyebrow">Your Voice</span><h1>Aplicații</h1></div>
+    <div class="hub-brand"><span class="eyebrow">Platforma ta</span><h1>Aplicații</h1></div>
     <div class="hub-user"><span id="hub-mail" class="hub-mail"></span><button id="hub-logout" class="btn-ghost" type="button">Ieși</button></div>
   </div>
   <p class="hub-lead">Alege aplicația cu care vrei să lucrezi. Te autentifici o singură dată, pentru toate.</p>
-  <div class="app-grid">
-    <a class="app-tile" href="/tasks.html"><span class="app-icon">✅</span><span class="app-body"><strong>Task &amp; Projects</strong><span class="app-desc">Planul de 90 de zile plus proiectele tale, cu sarcini și bife care se salvează.</span><span class="app-go">Deschide →</span></span></a>
-    <a class="app-tile" href="/qa.html"><span class="app-icon">🎙️</span><span class="app-body"><strong>QA Voice Board</strong><span class="app-desc">Testezi platforme și aplicații, dictezi ce observi, iar clientul primește un link cu ce merge, ce nu și ce ai rezolvat.</span><span class="app-go">Deschide →</span></span></a>
-    <a class="app-tile" href="https://scadentar.vercel.app" target="_blank" rel="noopener"><span class="app-icon">🚗</span><span class="app-body"><strong>Mașini</strong><span class="app-desc">Scadențar auto: ITP, RCA și rovinietă pentru toate mașinile, cu alerte pe email.</span><span class="app-go">Deschide →</span></span></a>
-    <a class="app-tile" href="/mail.html"><span class="app-icon">✉️</span><span class="app-body"><strong>Email</strong><span class="app-desc">Adresele tale, în platformă: citești, răspunzi și trimiți fără să mai deschizi altceva.</span><span class="app-go">Deschide →</span></span></a>
-  </div>
-  <p class="hub-foot">Fiecare aplicație ține minte cine ești, cât timp cookie-ul de sesiune e valid pe domeniul ei. Aceleași date de logare ca înainte.</p>
+  <div class="app-grid"><a class="app-tile" href="/board.html"><span class="app-icon">🎙️</span><span class="app-body"><strong>QA Voice Board</strong><span class="app-desc">Testezi platforme și aplicații, dictezi ce observi, iar clientul primește un link cu ce merge, ce nu și ce ai rezolvat.</span><span class="app-go">Deschide →</span></span></a><a class="app-tile" href="/tasks.html"><span class="app-icon">✅</span><span class="app-body"><strong>Task &amp; Projects</strong><span class="app-desc">Planul de 90 de zile plus proiectele tale, cu sarcini și bife care se salvează.</span><span class="app-go">Deschide →</span></span></a><a class="app-tile" href="https://scadentar.vercel.app" target="_blank" rel="noopener"><span class="app-icon">🚗</span><span class="app-body"><strong>Mașini</strong><span class="app-desc">Scadențar auto: ITP, RCA și rovinietă pentru toate mașinile, cu alerte pe email.</span><span class="app-go">Deschide →</span></span></a><a class="app-tile" href="/mail.html"><span class="app-icon">✉️</span><span class="app-body"><strong>Email</strong><span class="app-desc">Adresele tale, în platformă: citești, răspunzi și trimiți fără să mai deschizi altceva.</span><span class="app-go">Deschide →</span></span></a></div>
+  <p class="hub-foot">Fiecare cont are datele lui, separate. Linkurile trimise clienților rămân publice, fără cont.</p>
 </div>
-<div id="auth-gate" class="auth-overlay">
-  <div class="auth-card">
-    <h2>Intră în Your Voice</h2>
-    <p class="auth-sub">Aceleași date ca înainte.</p>
-    <form id="auth-login-form">
-      <label for="auth-email">Adresă de e-mail</label>
-      <input id="auth-email" type="email" autocomplete="username" required>
-      <label for="auth-password">Parolă</label>
-      <input id="auth-password" type="password" autocomplete="current-password" required>
-      <button class="btn-primary" type="submit">Intră</button>
-      <p id="auth-login-msg" class="auth-msg"></p>
-    </form>
-  </div>
-</div>
-<script>
-!function(){"use strict";
+<div id="auth-gate" class="auth-overlay"><div class="auth-layout"><section class="auth-intro"><p class="auth-eyebrow">Platforma ta</p><h1 class="auth-title">Testezi platforme și aplicații. Clientul află exact ce merge, ce nu și ce ai rezolvat.</h1><p class="auth-lead">Unealtă de lucru pentru cine verifică site-uri, aplicații și platforme pentru clienți. Spui cu voce ce observi în timp ce testezi, iar platforma îți transformă notițele într-un raport ordonat: ce trebuie reparat, ce ai modificat deja și cât ai lucrat. La final trimiți clientului un singur link, unde el bifează ce a implementat și îți răspunde direct de acolo.</p><ul class="auth-features"><li><span class="auth-feature-icon">🎙️</span><div><strong>Dictezi în timp ce testezi</strong><p>Nu te oprești din lucru ca să scrii. Vorbești, iar textul intră singur în listă, în română sau engleză.</p></div></li><li><span class="auth-feature-icon">🧠</span><div><strong>AI-ul face ordine</strong><p>Grupează notițele în task-uri cu verificări bifabile și separă singur ce e de făcut de ce ai rezolvat deja.</p></div></li><li><span class="auth-feature-icon">🔗</span><div><strong>Un link pentru client</strong><p>Vede ce nu funcționează, ce ai modificat și bifează ce a implementat. Răspunsul lui ajunge înapoi la tine.</p></div></li><li><span class="auth-feature-icon">⏱</span><div><strong>Timpul de lucru</strong><p>Se numără singur cât lucrezi, zi de zi, și îl poți trece în raportul trimis clientului.</p></div></li><li><span class="auth-feature-icon">🗒️</span><div><strong>Notițe doar pentru tine</strong><p>Separate de task-uri, cu dosare și dictare. Nu ajung niciodată la client.</p></div></li><li><span class="auth-feature-icon">📄</span><div><strong>Raport pe perioadă</strong><p>Un rezumat scris de AI despre ce s-a lucrat între două date, gata de trimis.</p></div></li></ul><p class="auth-note">Fiecare cont are datele lui, separate. Linkurile trimise clienților rămân publice, fără cont.</p></section><div class="auth-card"><h2>Intră în platformă</h2><p class="auth-sub">Datele tale sunt private. Linkurile trimise clienților rămân publice, fără cont.</p><form id="auth-login-form"><label for="auth-email">Adresă de e-mail</label><input id="auth-email" type="email" autocomplete="username" required /><label for="auth-password">Parolă</label><input id="auth-password" type="password" autocomplete="current-password" required /><button class="btn-primary" type="submit">Intră</button><p id="auth-login-msg" class="auth-msg"></p></form></div></div></div>
+<script>!function(){function stop(t){t.preventDefault()}["gesturestart","gesturechange","gestureend"].forEach(function(n){document.addEventListener(n,stop,{passive:!1})});var last=0;document.addEventListener("touchend",function(t){var n=Date.now();n-last<=320&&t.preventDefault();last=n},{passive:!1});document.addEventListener("touchmove",function(t){t.touches&&t.touches.length>1&&t.preventDefault()},{passive:!1})}();</script>
+<script>!function(){"use strict";
+var LOCAL_KEYS=["qa-voice-board-state","qa-voice-board-plan-seen","qa-voice-board-plan-updates","qa-voice-board-work-last","qa-voice-board-work-own","qa-voice-board-plan-ids","qa-voice-board-notes-pos"];
 function el(id){return document.getElementById(id)}
+function clearLocal(){try{LOCAL_KEYS.forEach(function(k){localStorage.removeItem(k)})}catch(t){}}
+function setOwner(m){try{m?localStorage.setItem("qa-voice-board-owner",m):localStorage.removeItem("qa-voice-board-owner")}catch(t){}}
+function hasSession(){return document.cookie.split(";").some(function(c){return c.trim().indexOf("qavb_ok=1")===0})}
 function msg(t,bad){var m=el("auth-login-msg");if(m){m.textContent=t||"";m.className="auth-msg"+(bad?" bad":"")}}
-function showGate(){el("auth-gate").hidden=!1;el("hub").hidden=!0}
-function showHub(){el("auth-gate").hidden=!0;el("hub").hidden=!1}
+function showGate(){el("auth-gate").hidden=!1;el("hub").hidden=!0;document.body.style.overflow="hidden"}
+function showHub(){el("auth-gate").hidden=!0;el("hub").hidden=!1;document.body.style.overflow=""}
 function post(url,body){return fetch(url,{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify(body||{})}).then(function(r){return r.json().catch(function(){return{}}).then(function(d){return{status:r.status,data:d}})})}
+function init(){
 var f=el("auth-login-form");
-f.addEventListener("submit",function(ev){ev.preventDefault();msg("");
+f&&f.addEventListener("submit",function(ev){ev.preventDefault();msg("");
 var inputs=f.querySelectorAll("input,button");Array.prototype.forEach.call(inputs,function(x){x.disabled=!0});
 post("/api/auth?action=login",{email:(el("auth-email").value||"").trim(),password:el("auth-password").value||""}).then(function(r){
 if(200!==r.status){Array.prototype.forEach.call(inputs,function(x){x.disabled=!1});msg(r.data&&r.data.message||"Autentificare eșuată.",!0);return}
-location.reload()}).catch(function(){Array.prototype.forEach.call(inputs,function(x){x.disabled=!1});msg("Nu am putut contacta serverul.",!0)})});
-el("hub-logout").addEventListener("click",function(){post("/api/auth?action=logout").then(function(){location.reload()}).catch(function(){location.reload()})});
+clearLocal();setOwner(r.data&&r.data.email||"");location.reload()}).catch(function(){Array.prototype.forEach.call(inputs,function(x){x.disabled=!1});msg("Nu am putut contacta serverul.",!0)})});
+var out=el("hub-logout");
+out&&out.addEventListener("click",function(){clearLocal();setOwner("");post("/api/auth?action=logout").then(function(){location.reload()}).catch(function(){location.reload()})});
+if(!hasSession())return void showGate();
 fetch("/api/auth?action=me",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){
-if(!d||!d.authenticated)return void showGate();
+if(!d||!d.authenticated){try{document.cookie="qavb_ok=; Path=/; Max-Age=0"}catch(t){}return void showGate()}
+setOwner(d.email||"");
 var m=el("hub-mail");m&&(m.textContent=d.email||"");
-showHub()}).catch(function(){showGate()})
-}();
-</script>
+showHub()}).catch(function(){showGate()})}
+document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init):init()}();</script>
 </body>
 </html>
