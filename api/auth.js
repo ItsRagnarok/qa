@@ -24,8 +24,8 @@ function signingKey() {
   return createHmac("sha256", SERVICE_KEY).update("your-voice-session-v1").digest();
 }
 
-function sign(email, expires) {
-  const payload = `${email}|${expires}`;
+function sign(email, expires, pwVersion) {
+  const payload = `${email}|${expires}|${pwVersion || 0}`;
   const mac = createHmac("sha256", signingKey()).update(payload).digest("hex");
   return `${Buffer.from(payload).toString("base64url")}.${mac}`;
 }
@@ -44,9 +44,17 @@ function verify(token) {
   const a = Buffer.from(mac);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
-  const [email, expires] = payload.split("|");
+  const [email, expires, pwVersion] = payload.split("|");
   if (!email || !expires || Number(expires) < Date.now()) return null;
-  return email;
+  return { email, pwVersion: Number(pwVersion) || 0 };
+}
+
+function setSessionCookie(res, email, pwVersion) {
+  const expires = Date.now() + MAX_AGE * 1000;
+  res.setHeader("set-cookie", [
+    `${COOKIE}=${encodeURIComponent(sign(email, expires, pwVersion))}; Path=/; Max-Age=${MAX_AGE}; HttpOnly; Secure; SameSite=Lax`,
+    `qavb_ok=1; Path=/; Max-Age=${MAX_AGE}; Secure; SameSite=Lax`,
+  ]);
 }
 
 function readCookie(req, name) {
@@ -59,13 +67,27 @@ function readCookie(req, name) {
   return null;
 }
 
-/** Shared by every other function in this project: the session cookie for the current request, or null. */
-export function sessionEmail(req) {
-  return verify(readCookie(req, COOKIE));
+/**
+ * Shared by every other function in this project: the session cookie's email for the
+ * current request, or null. Also checked against the account's current password_version,
+ * so a password reset invalidates any cookie signed before it (that's the one extra query
+ * this adds per request — fine at this app's scale).
+ */
+export async function sessionEmail(req) {
+  const parsed = verify(readCookie(req, COOKIE));
+  if (!parsed) return null;
+  let user;
+  try {
+    user = await findUser(parsed.email);
+  } catch {
+    return null;
+  }
+  if (!user || (user.password_version || 0) !== parsed.pwVersion) return null;
+  return parsed.email;
 }
 
 async function findUser(email) {
-  const url = `${base()}/app_users?select=email,password_hash,must_change,is_admin&email=eq.${encodeURIComponent(email)}&limit=1`;
+  const url = `${base()}/app_users?select=email,password_hash,must_change,is_admin,password_version&email=eq.${encodeURIComponent(email)}&limit=1`;
   const r = await fetch(url, { headers: dbHeaders() });
   if (!r.ok) throw new Error(`Supabase ${r.status}`);
   const rows = await r.json();
@@ -111,7 +133,7 @@ async function readBody(req) {
 }
 
 async function requireAdmin(req) {
-  const email = sessionEmail(req);
+  const email = await sessionEmail(req);
   if (!email) return { email: null, isAdmin: false };
   const user = await findUser(email);
   return { email, isAdmin: !!(user && user.is_admin) };
@@ -179,7 +201,11 @@ async function handleAdmin(req, res) {
     const r = await fetch(`${base()}/app_users?email=eq.${encodeURIComponent(addr)}`, {
       method: "PATCH",
       headers: dbHeaders({ prefer: "return=minimal" }),
-      body: JSON.stringify({ password_hash: hash, must_change: !!body.mustChange, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({
+        password_hash: hash, must_change: !!body.mustChange,
+        password_version: (target.password_version || 0) + 1,
+        updated_at: new Date().toISOString(),
+      }),
     });
     if (!r.ok) return json(res, 502, { message: "Nu am putut schimba parola." });
     return json(res, 200, { email: addr, password });
@@ -225,7 +251,7 @@ export default async function handler(req, res) {
   const action = new URL(req.url, "http://x").searchParams.get("action");
 
   if (action === "me") {
-    const email = sessionEmail(req);
+    const email = await sessionEmail(req);
     if (!email) return json(res, 200, { authenticated: false, email: null });
     let user = null;
     try {
@@ -256,7 +282,7 @@ export default async function handler(req, res) {
 
   if (action === "password") {
     if (req.method !== "POST") return json(res, 405, { message: "Metodă nepermisă." });
-    const email = sessionEmail(req);
+    const email = await sessionEmail(req);
     if (!email) return json(res, 401, { message: "Neautentificat." });
     const { currentPassword, newPassword } = await readBody(req);
     if (!newPassword || String(newPassword).length < 8) {
@@ -274,12 +300,16 @@ export default async function handler(req, res) {
       if (!ok) return json(res, 401, { message: "Parola actuală este greșită." });
     }
     const hash = await hashPassword(String(newPassword));
+    const nextVersion = (user.password_version || 0) + 1;
     const r = await fetch(`${base()}/app_users?email=eq.${encodeURIComponent(email)}`, {
       method: "PATCH",
       headers: dbHeaders({ prefer: "return=minimal" }),
-      body: JSON.stringify({ password_hash: hash, must_change: false, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({ password_hash: hash, must_change: false, password_version: nextVersion, updated_at: new Date().toISOString() }),
     });
     if (!r.ok) return json(res, 502, { message: "Nu am putut schimba parola." });
+    // Changing your own password bumps password_version, which would otherwise invalidate
+    // the very cookie this request is using — reissue it so this session stays logged in.
+    setSessionCookie(res, email, nextVersion);
     return json(res, 200, { ok: true });
   }
 
@@ -309,10 +339,6 @@ export default async function handler(req, res) {
     body: JSON.stringify({ last_login_at: new Date().toISOString() }),
   }).catch(() => {});
 
-  const expires = Date.now() + MAX_AGE * 1000;
-  res.setHeader("set-cookie", [
-    `${COOKIE}=${encodeURIComponent(sign(user.email, expires))}; Path=/; Max-Age=${MAX_AGE}; HttpOnly; Secure; SameSite=Lax`,
-    `qavb_ok=1; Path=/; Max-Age=${MAX_AGE}; Secure; SameSite=Lax`,
-  ]);
+  setSessionCookie(res, user.email, user.password_version || 0);
   return json(res, 200, { ok: true, email: user.email });
 }

@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const email = sessionEmail(req);
+  const email = await sessionEmail(req);
   if (!email) return json(res, 401, { message: "Neautentificat." });
 
   const row = `${SUPABASE_URL}/rest/v1/project_tasks`;

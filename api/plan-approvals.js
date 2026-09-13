@@ -27,7 +27,7 @@ async function readBody(req) {
 export default async function handler(req, res) {
   if (!SERVICE_KEY) return json(res, 500, { message: "Lipsește configurarea serverului." });
 
-  const email = sessionEmail(req);
+  const email = await sessionEmail(req);
   if (!email) return json(res, 401, { message: "Neautentificat." });
 
   try {

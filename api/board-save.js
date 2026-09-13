@@ -61,7 +61,7 @@ export default async function handler(req, res) {
   if (!SERVICE_KEY) return json(res, 500, { message: "Lipsește SUPABASE_SERVICE_ROLE_KEY din setările proiectului Vercel." });
   if (req.method !== "POST") return json(res, 405, { message: "Metodă nepermisă." });
 
-  const email = sessionEmail(req);
+  const email = await sessionEmail(req);
   if (!email) return json(res, 401, { message: "Neautentificat." });
 
   const body = await readBody(req);

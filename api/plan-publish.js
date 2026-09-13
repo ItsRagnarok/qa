@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   if (!SERVICE_KEY) return json(res, 502, { error: "missing_supabase_env", message: "Lipsesc SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY în proiectul Vercel." });
   if (req.method !== "POST") return json(res, 405, { message: "Metodă nepermisă." });
 
-  const email = sessionEmail(req);
+  const email = await sessionEmail(req);
   if (!email) return json(res, 401, { message: "Neautentificat." });
 
   const body = await readBody(req);

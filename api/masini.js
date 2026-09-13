@@ -38,7 +38,7 @@ function toClient(row) {
 export default async function handler(req, res) {
   if (!SERVICE_KEY) return json(res, 500, { message: "Lipsește SUPABASE_SERVICE_ROLE_KEY din setările proiectului Vercel." });
 
-  const email = sessionEmail(req);
+  const email = await sessionEmail(req);
   if (!email) return json(res, 401, { message: "Neautentificat." });
 
   try {

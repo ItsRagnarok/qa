@@ -953,27 +953,39 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
 
   function bootServer(){
     statusSalvare('Se încarcă…');
+    var localVehicles=citeste(), localEmails=emailuriGenerale();
+    var localAreDate = localVehicles.length>0 || localEmails.length>0;
     return fetch('/api/masini',{credentials:'same-origin'}).then(function(r){
       if(401===r.status){ location.replace('/'); return null; }
       if(!r.ok) throw new Error('load_failed');
       return r.json();
     }).then(function(s){
-      if(!s) return;
-      if(Array.isArray(s.vehicles)) scrie(s.vehicles);
-      if(Array.isArray(s.alertEmails)) scrieEmailuri(s.alertEmails);
-      if(Number.isInteger(s.limita)&&s.limita>0) set(CHEIE_LIM,String(s.limita));
+      if(!s) return false;
+      var serverAreDate = (s.vehicles&&s.vehicles.length>0) || (s.alertEmails&&s.alertEmails.length>0);
+      if(serverAreDate || !localAreDate){
+        // serverul e sursa de adevar odata ce are ceva — sau nu era nimic local de pastrat.
+        if(Array.isArray(s.vehicles)) scrie(s.vehicles);
+        if(Array.isArray(s.alertEmails)) scrieEmailuri(s.alertEmails);
+        if(Number.isInteger(s.limita)&&s.limita>0) set(CHEIE_LIM,String(s.limita));
+        statusSalvare('');
+        return false;
+      }
+      // migrare: server gol, dar ai date locale de dinainte sa existe salvarea pe server — le pastram si le urcam.
       statusSalvare('');
+      return true;
     }).catch(function(){
       statusSalvare('Nu am putut contacta serverul — lucrezi temporar doar local.');
+      return false;
     });
   }
 
-  bootServer().then(function(){
+  bootServer().then(function(migreaza){
     suprimaSalvare=false;
     elLimita.value=limita();
     randeaza();
     randeazaAlerte();
     nota(null);
+    if(migreaza) pushServer();
   });
 
   fetch('/api/verifica').then(function(r){return r.json();}).then(function(j){
