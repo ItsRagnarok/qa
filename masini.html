@@ -237,6 +237,8 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
 @media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important}}
 .back-fab{position:fixed;top:14px;left:14px;z-index:20;display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line-strong);border-radius:999px;padding:9px 15px;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;box-shadow:var(--shadow)}
 .back-fab:hover{border-color:var(--accent);color:var(--accent)}
+.today-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.save-status{font-size:11.5px;color:var(--ink-3);min-height:14px}
 @media(max-width:720px){.back-fab{top:10px;left:10px;padding:9px 13px;font-size:12.5px}}
 </style>
 </head>
@@ -248,7 +250,7 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
       <h1>Scadențar Auto</h1>
       <p class="sub">Pui numărul de înmatriculare și VIN-ul. Rovinieta se verifică gratuit la CNAIR, iar RCA prin furnizorul configurat.</p>
     </div>
-    <div class="today" id="azi"></div>
+    <div class="today-wrap"><div class="today" id="azi"></div><div class="save-status" id="salvare-stare"></div></div>
   </header>
 
   <div id="banner"></div>
@@ -513,7 +515,22 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
     try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; }
   })();
   function get(k){ if(!areStocare) return mem[k]; try{ return localStorage.getItem(k); }catch(e){ return null; } }
-  function set(k,v){ if(!areStocare){ mem[k]=v; return; } try{ localStorage.setItem(k,v); }catch(e){} }
+  var suprimaSalvare=true, saveTimer=null, statusEl=document.getElementById('salvare-stare');
+  function statusSalvare(t){ if(statusEl) statusEl.textContent=t||''; }
+  function pushServer(){
+    clearTimeout(saveTimer);
+    statusSalvare('Se salvează…');
+    saveTimer=setTimeout(function(){
+      fetch('/api/masini',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
+        body:JSON.stringify({vehicles:citeste(), alertEmails:emailuriGenerale(), limita:limita()})})
+        .then(function(r){ statusSalvare(r.ok?'Salvat.':'Nu s-a putut salva.'); })
+        .catch(function(){ statusSalvare('Nu s-a putut salva — verifică conexiunea.'); });
+    }, 500);
+  }
+  function set(k,v){
+    if(!areStocare){ mem[k]=v; } else { try{ localStorage.setItem(k,v); }catch(e){} }
+    if(!suprimaSalvare) pushServer();
+  }
 
   function citeste(){
     var b=get(CHEIE); if(!b) return [];
@@ -933,10 +950,31 @@ details.mai[open] > summary{border-bottom:1px solid var(--line)}
   var d=new Date();
   document.getElementById('azi').textContent='azi '+String(d.getDate()).padStart(2,'0')+'.'
     +String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
-  elLimita.value=limita();
-  randeaza();
-  randeazaAlerte();
-  nota(null);
+
+  function bootServer(){
+    statusSalvare('Se încarcă…');
+    return fetch('/api/masini',{credentials:'same-origin'}).then(function(r){
+      if(401===r.status){ location.replace('/'); return null; }
+      if(!r.ok) throw new Error('load_failed');
+      return r.json();
+    }).then(function(s){
+      if(!s) return;
+      if(Array.isArray(s.vehicles)) scrie(s.vehicles);
+      if(Array.isArray(s.alertEmails)) scrieEmailuri(s.alertEmails);
+      if(Number.isInteger(s.limita)&&s.limita>0) set(CHEIE_LIM,String(s.limita));
+      statusSalvare('');
+    }).catch(function(){
+      statusSalvare('Nu am putut contacta serverul — lucrezi temporar doar local.');
+    });
+  }
+
+  bootServer().then(function(){
+    suprimaSalvare=false;
+    elLimita.value=limita();
+    randeaza();
+    randeazaAlerte();
+    nota(null);
+  });
 
   fetch('/api/verifica').then(function(r){return r.json();}).then(function(j){
     var rca = j.rcaDisponibil
